@@ -1,5 +1,5 @@
-#ifndef OSG_TIMER
-#define OSG_TIMER 1
+#ifndef HEADER_GUARD_TIMER_H
+#define HEADER_GUARD_TIMER_H
 
 namespace JAZZROS {
 
@@ -113,4 +113,4 @@ namespace JAZZROS {
 
 } // namespace JAZZROS
 
-#endif
+#endif // HEADER_GUARD_TIMER_H

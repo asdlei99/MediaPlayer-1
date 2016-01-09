@@ -2,18 +2,23 @@ LOCAL_PATH := $(call my-dir)
 
 include $(CLEAR_VARS)
 
+LOCAL_C_INCLUDES += $(LOCAL_PATH)/libsrc/threads/OpenThreads/include
+
 LOCAL_MODULE    := avjni
 LOCAL_SRC_FILES := ./libsrc/FFmpegParameters.cpp
 LOCAL_SRC_FILES += ./libsrc/readers/FFmpegAudioReader.cpp
 LOCAL_SRC_FILES += ./libsrc/readers/FFmpegVideoReader.cpp
 LOCAL_SRC_FILES += ./libsrc/FFmpegAudioReaderFuncs.cpp
-LOCAL_SRC_FILES += ./libsrc/FFmpegWrapper.cpp
+LOCAL_SRC_FILES += ./libsrc/readers/FFmpegWrapper.cpp
 LOCAL_SRC_FILES += ./libsrc/FFmpegFileHolder.cpp
 LOCAL_SRC_FILES += ./libsrc/buffers/VideoVectorBuffer.cpp
 LOCAL_SRC_FILES += ./libsrc/buffers/AudioBuffer.cpp
 LOCAL_SRC_FILES += ./libsrc/system/System_routine.cpp
 LOCAL_SRC_FILES += ./libsrc/system/Timer.cpp
 LOCAL_SRC_FILES += ./libsrc/system/FFmpegTimer.cpp
+ LOCAL_SRC_FILES += ./libsrc/threads/OpenThreads/pthread_src/PThread.c++
+LOCAL_SRC_FILES += ./libsrc/threads/OpenThreads/pthread_src/PThreadMutex.c++
+ LOCAL_SRC_FILES += ./libsrc/threads/FFmpegRenderThread.cpp
 LOCAL_SRC_FILES += avjni.c
 
 LOCAL_CFLAGS    := -D__unix__

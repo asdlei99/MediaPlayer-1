@@ -3,6 +3,7 @@
 
 #include <pthread.h>
 
+// todo: could be replaced by crossplatform OpenThreads::Mutex
 struct CThreadLock
 {
     pthread_mutex_t mutexlock;

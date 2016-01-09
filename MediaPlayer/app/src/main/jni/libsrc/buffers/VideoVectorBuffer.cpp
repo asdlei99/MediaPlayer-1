@@ -1,5 +1,5 @@
 #include "VideoVectorBuffer.hpp"
-#include "../FFmpegWrapper.hpp"
+#include "../readers/FFmpegWrapper.hpp"
 #include "../threads/ScopedLock.h"
 #include <limits>
 

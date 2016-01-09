@@ -1,7 +1,7 @@
 #ifndef HEADER_GUARD_FFMPEG_AUDIOBUFFER_H
 #define HEADER_GUARD_FFMPEG_AUDIOBUFFER_H
 
-#include "../threads/Mutex.h"
+#include <OpenThreads/Mutex>
 #include "../threads/ScopedLock.h"
 
 
@@ -9,6 +9,9 @@ namespace JAZZROS {
 
 class AudioBuffer
 {
+    typedef OpenThreads::Mutex              Mutex;
+    typedef TScopedLock<Mutex>              ScopedLock;
+
     Mutex                                   m_mutex;
     volatile unsigned char *                m_Buffer;
     int                                     m_bufferSize;

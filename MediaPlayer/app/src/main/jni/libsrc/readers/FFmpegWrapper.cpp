@@ -1,6 +1,6 @@
 #include "FFmpegWrapper.hpp"
-#include "readers/FFmpegVideoReader.hpp"
-#include "readers/FFmpegAudioReader.hpp"
+#include "FFmpegVideoReader.hpp"
+#include "FFmpegAudioReader.hpp"
 
 namespace JAZZROS {
 

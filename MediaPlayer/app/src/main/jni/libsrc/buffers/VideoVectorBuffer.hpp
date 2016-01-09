@@ -2,7 +2,8 @@
 #define HEADER_GUARD_FFMPEG_VIDEOVECTORBUFFER_H
 
 #include "../FFmpegFileHolder.hpp"
-#include "../threads/Mutex.h"
+#include <OpenThreads/Mutex>
+#include "../threads/ScopedLock.h"
 #include <vector>
 
 namespace JAZZROS {
@@ -74,6 +75,9 @@ class VideoVectorBuffer
     };
 
 private:
+    typedef OpenThreads::Mutex      Mutex;
+    typedef TScopedLock<Mutex>      ScopedLock;
+
     mutable Mutex                   m_mutex;
     long                            m_fileIndex;
     unsigned long                   m_videoLength;

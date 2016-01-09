@@ -2,7 +2,7 @@
 #define HEADER_GUARD_FFMPEG_WRAPPER_H
 
 #include <map>
-#include "FFmpegHeaders.hpp"
+#include "../FFmpegHeaders.hpp"
 
 namespace JAZZROS {
 

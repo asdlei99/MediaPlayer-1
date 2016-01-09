@@ -17,7 +17,7 @@ class FFmpegILibAvStreamImpl
 public:
     virtual                         ~FFmpegILibAvStreamImpl() {};
 
-    virtual void                    setAudioSink(osg::AudioSink * audio_sink) = 0;
+//    virtual void                    setAudioSink(osg::AudioSink * audio_sink) = 0;
     virtual void                    setAudioDelayMicroSec (const double & audioDelayMicroSec) = 0;
     virtual const int               initialize(const FFmpegFileHolder * pHolder, FFmpegPlayer * pPlayer) = 0;
     virtual void                    loop(const bool loop) = 0;

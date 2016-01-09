@@ -1,32 +1,34 @@
 #ifndef HEADER_GUARD_SCOPEDLOCK_H
 #define HEADER_GUARD_SCOPEDLOCK_H
 
-#include "Mutex.h"
+#include <OpenThreads/Mutex>
 
 namespace JAZZROS {
 
-    class ScopedLock {
+    template<class M>
+    class TScopedLock {
     private:
-        Mutex m_mutex;
+        M &m_lock;
 
-        ScopedLock(const ScopedLock &copy);
-
-        ScopedLock &operator=(const ScopedLock &rhs);
-
+        TScopedLock(const TScopedLock &); // prevent copy
+        TScopedLock &operator=(const TScopedLock &); // prevent assign
     public:
-        ScopedLock(Mutex &m) : m_mutex(m) {
-            pthread_mutex_lock(m_mutex.get());
-        }
+        explicit TScopedLock(M &m) : m_lock(m) { m_lock.lock(); }
 
-        ~ScopedLock() {
-            pthread_mutex_unlock(m_mutex.get());
-        }
+        ~TScopedLock() { m_lock.unlock(); }
+    };
 
-        void wait(pthread_cond_t *cond) {
-            int rc = 0;
+    template<class M>
+    class ReverseTScopedLock {
+    private:
+        M &m_lock;
 
-            rc = pthread_cond_wait(cond, m_mutex.get());
-        }
+        ReverseTScopedLock(const ReverseTScopedLock &); // prevent copy
+        ReverseTScopedLock &operator=(const ReverseTScopedLock &); // prevent assign
+    public:
+        explicit ReverseTScopedLock(M &m) : m_lock(m) { m_lock.unlock(); }
+
+        ~ReverseTScopedLock() { m_lock.lock(); }
     };
 } // JAZZROS
 
