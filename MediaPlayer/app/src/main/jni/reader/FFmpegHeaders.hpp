@@ -139,5 +139,12 @@ extern "C" {
 } // extern "C" {
 #endif
 
+#ifdef __cplusplus
+namespace JAZZROS
+{
+    AVRational get_time_base_q(void);
+    const double now_micros(void);
+}
+#endif
 
 #endif // HEADER_GUARD_FFMPEG_HEADERS_H

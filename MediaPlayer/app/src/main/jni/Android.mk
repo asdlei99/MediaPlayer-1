@@ -6,6 +6,8 @@ LOCAL_MODULE    := avjni
 LOCAL_SRC_FILES := ./reader/FFmpegParameters.cpp
 LOCAL_SRC_FILES += ./reader/FFmpegAudioReader.cpp
 LOCAL_SRC_FILES += ./reader/FFmpegAudioReaderFuncs.cpp 
+LOCAL_SRC_FILES += ./reader/FFmpegVideoReader.cpp
+LOCAL_SRC_FILES += ./reader/FFmpegWrapper.cpp
 LOCAL_SRC_FILES += avjni.c
 
 # LOCAL_LDLIBS := -llog -ljnigraphics -lz -landroid

@@ -21,7 +21,7 @@ AVRational get_time_base_q(void)
 }
 
 /* return current time */
-static double now_micros(void) {
+const double now_micros(void) {
 
     struct timespec res;
     clock_gettime(CLOCK_REALTIME, &res);
