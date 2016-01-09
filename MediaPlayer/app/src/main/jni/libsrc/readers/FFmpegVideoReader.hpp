@@ -1,8 +1,8 @@
 #ifndef HEADER_GUARD_FFMPEG_VIDEOREADER_H
 #define HEADER_GUARD_FFMPEG_VIDEOREADER_H
 
-#include "FFmpegHeaders.hpp"
-#include "FFmpegIExternalDecoder.hpp"
+#include "../FFmpegHeaders.hpp"
+#include "../FFmpegIExternalDecoder.hpp"
 
 namespace JAZZROS {
 

@@ -3,11 +3,12 @@ LOCAL_PATH := $(call my-dir)
 include $(CLEAR_VARS)
 
 LOCAL_MODULE    := avjni
-LOCAL_SRC_FILES := ./reader/FFmpegParameters.cpp
-LOCAL_SRC_FILES += ./reader/FFmpegAudioReader.cpp
-LOCAL_SRC_FILES += ./reader/FFmpegAudioReaderFuncs.cpp 
-LOCAL_SRC_FILES += ./reader/FFmpegVideoReader.cpp
-LOCAL_SRC_FILES += ./reader/FFmpegWrapper.cpp
+LOCAL_SRC_FILES := ./libsrc/FFmpegParameters.cpp
+LOCAL_SRC_FILES += ./libsrc/readers/FFmpegAudioReader.cpp
+LOCAL_SRC_FILES += ./libsrc/readers/FFmpegVideoReader.cpp
+LOCAL_SRC_FILES += ./libsrc/FFmpegAudioReaderFuncs.cpp
+LOCAL_SRC_FILES += ./libsrc/FFmpegWrapper.cpp
+LOCAL_SRC_FILES += ./libsrc/FFmpegFileHolder.cpp
 LOCAL_SRC_FILES += avjni.c
 
 # LOCAL_LDLIBS := -llog -ljnigraphics -lz -landroid

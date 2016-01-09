@@ -1,7 +1,7 @@
 #ifndef HEADER_GUARD_FFMPEG_AUDIOREADER_H
 #define HEADER_GUARD_FFMPEG_AUDIOREADER_H
 
-#include "FFmpegHeaders.hpp"
+#include "../FFmpegHeaders.hpp"
 
 namespace JAZZROS {
 

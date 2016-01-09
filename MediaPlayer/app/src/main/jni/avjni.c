@@ -9,7 +9,7 @@
 #include <android/log.h>
 #include <android/bitmap.h>
 
-#include "reader/FFmpegHeaders.hpp"
+#include "libsrc/FFmpegHeaders.hpp"
 
 
 #ifdef USE_AV_LOCK_MANAGER

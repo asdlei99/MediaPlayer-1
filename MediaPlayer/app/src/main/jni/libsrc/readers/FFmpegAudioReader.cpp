@@ -1,5 +1,5 @@
 #include "FFmpegAudioReader.hpp"
-#include "FFmpegParameters.hpp"
+#include "../FFmpegParameters.hpp"
 #include <string>
 #include <time.h>
 

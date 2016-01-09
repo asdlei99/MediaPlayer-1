@@ -1,5 +1,5 @@
 #include "FFmpegVideoReader.hpp"
-#include "FFmpegParameters.hpp"
+#include "../FFmpegParameters.hpp"
 #ifdef USE_VDPAU
     #include "VDPAU/VDPAUDecoder.hpp"
 #endif // USE_VDPAU
