@@ -9,7 +9,7 @@ extern "C"
 {
 
 #ifdef USE_AV_LOCK_MANAGER
-    #include "libsrc/ThreadLock.h"
+    #include "libsrc/threads/ThreadLock.h"
     static int lockMgr(void **mutex, enum AVLockOp op)
     {
         // returns are 0 success
