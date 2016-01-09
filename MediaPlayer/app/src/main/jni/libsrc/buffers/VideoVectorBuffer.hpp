@@ -1,8 +1,8 @@
 #ifndef HEADER_GUARD_FFMPEG_VIDEOVECTORBUFFER_H
 #define HEADER_GUARD_FFMPEG_VIDEOVECTORBUFFER_H
 
-#include "FFmpegFileHolder.hpp"
-#include "threads/Mutex.h"
+#include "../FFmpegFileHolder.hpp"
+#include "../threads/Mutex.h"
 #include <vector>
 
 namespace JAZZROS {

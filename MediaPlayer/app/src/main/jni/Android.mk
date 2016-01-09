@@ -9,7 +9,8 @@ LOCAL_SRC_FILES += ./libsrc/readers/FFmpegVideoReader.cpp
 LOCAL_SRC_FILES += ./libsrc/FFmpegAudioReaderFuncs.cpp
 LOCAL_SRC_FILES += ./libsrc/FFmpegWrapper.cpp
 LOCAL_SRC_FILES += ./libsrc/FFmpegFileHolder.cpp
-LOCAL_SRC_FILES += ./libsrc/VideoVectorBuffer.cpp
+LOCAL_SRC_FILES += ./libsrc/buffers/VideoVectorBuffer.cpp
+LOCAL_SRC_FILES += ./libsrc/buffers/AudioBuffer.cpp
 LOCAL_SRC_FILES += ./libsrc/system/System_routine.cpp
 LOCAL_SRC_FILES += avjni.c
 

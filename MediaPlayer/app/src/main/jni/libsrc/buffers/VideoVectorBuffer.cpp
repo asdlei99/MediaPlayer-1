@@ -1,6 +1,6 @@
 #include "VideoVectorBuffer.hpp"
-#include "FFmpegWrapper.hpp"
-#include "threads/ScopedLock.h"
+#include "../FFmpegWrapper.hpp"
+#include "../threads/ScopedLock.h"
 #include <limits>
 
 size_t getMemorySize();
