@@ -12,6 +12,8 @@ LOCAL_SRC_FILES += ./libsrc/FFmpegFileHolder.cpp
 LOCAL_SRC_FILES += ./libsrc/buffers/VideoVectorBuffer.cpp
 LOCAL_SRC_FILES += ./libsrc/buffers/AudioBuffer.cpp
 LOCAL_SRC_FILES += ./libsrc/system/System_routine.cpp
+LOCAL_SRC_FILES += ./libsrc/system/Timer.cpp
+LOCAL_SRC_FILES += ./libsrc/system/FFmpegTimer.cpp
 LOCAL_SRC_FILES += avjni.c
 
 LOCAL_CFLAGS    := -D__unix__
