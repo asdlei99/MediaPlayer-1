@@ -63,7 +63,7 @@ FFmpegRenderThread::run()
         //
         GLint                   internalTexFmt;
         GLint                   pixFmt;
-//ros:        FFmpegFileHolder::getGLPixFormats (m_pFileHolder->getPixFormat(), internalTexFmt, pixFmt);
+        FFmpegFileHolder::getGLPixFormats (m_pFileHolder->getPixFormat(), internalTexFmt, pixFmt);
         //
         while (m_renderingThreadStop == false)
         {

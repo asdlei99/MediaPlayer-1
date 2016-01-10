@@ -77,7 +77,7 @@ FFmpegFileHolder::getPixFormat() const
     return m_pixFmt;
 }
 
-/* ros:
+
 void
 FFmpegFileHolder::getGLPixFormats (const AVPixelFormat pixFmt, GLint & outInternalTexFmt, GLint & outPixFmt)
 {
@@ -92,6 +92,7 @@ FFmpegFileHolder::getGLPixFormats (const AVPixelFormat pixFmt, GLint & outIntern
             outPixFmt = GL_RGB;
             break;
         }
+        /* ros:
         case AV_PIX_FMT_BGR24:
         {
             outInternalTexFmt = GL_RGB;
@@ -104,6 +105,7 @@ FFmpegFileHolder::getGLPixFormats (const AVPixelFormat pixFmt, GLint & outIntern
             outPixFmt = GL_BGRA;
             break;
         }
+         */
         case AV_PIX_FMT_RGBA:
         {
             outInternalTexFmt = GL_RGBA;
@@ -116,7 +118,7 @@ FFmpegFileHolder::getGLPixFormats (const AVPixelFormat pixFmt, GLint & outIntern
         }
     };
 }
-*/
+
 const short
 FFmpegFileHolder::open (const std::string & filename, FFmpegParameters* parameters)
 {

@@ -18,7 +18,12 @@ LOCAL_SRC_FILES += ./libsrc/system/Timer.cpp
 LOCAL_SRC_FILES += ./libsrc/system/FFmpegTimer.cpp
  LOCAL_SRC_FILES += ./libsrc/threads/OpenThreads/pthread_src/PThread.c++
 LOCAL_SRC_FILES += ./libsrc/threads/OpenThreads/pthread_src/PThreadMutex.c++
+LOCAL_SRC_FILES += ./libsrc/threads/OpenThreads/pthread_src/PThreadCondition.c++
  LOCAL_SRC_FILES += ./libsrc/threads/FFmpegRenderThread.cpp
+LOCAL_SRC_FILES += ./libsrc/streams/FFmpegStreamer.cpp
+LOCAL_SRC_FILES += ./libsrc/streams/FFmpegLibAvStreamImpl.cpp
+LOCAL_SRC_FILES += ./libsrc/streams/FFmpegAudioStream.cpp
+LOCAL_SRC_FILES += ./libsrc/FFmpegPlayer.cpp
 LOCAL_SRC_FILES += avjni.c
 
 LOCAL_CFLAGS    := -D__unix__

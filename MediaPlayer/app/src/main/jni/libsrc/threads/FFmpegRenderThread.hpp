@@ -1,9 +1,9 @@
 #ifndef HEADER_GUARD_FFMPEG_RENDERTHREAD_H
 #define HEADER_GUARD_FFMPEG_RENDERTHREAD_H
 
-//#include <osg/ImageStream>
 #include <OpenThreads/Thread>
 #include "../FFmpegFileHolder.hpp"
+#include "../devices/ImageStream.hpp"
 
 namespace JAZZROS {
 
@@ -11,15 +11,7 @@ class FFmpegILibAvStreamImpl;
 class FFmpegFileHolder;
 
 
-#define GLint   int
-class ImageStream
-{
-public:
-virtual void setImage(const unsigned short & width, const unsigned short & height, const int & someInt,
-              const GLint & interanlTexFormat,
-                const GLint & pixFormat,
-                unsigned char * pFramePtr) = 0;
-};
+
 
 
 class FFmpegRenderThread : protected OpenThreads::Thread

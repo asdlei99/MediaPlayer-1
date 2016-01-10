@@ -2,6 +2,7 @@
 #define HEADER_GUARD_FFMPEG_FILEHOLDER_H
 
 #include "FFmpegHeaders.hpp"
+#include "devices/ImageStream.hpp" // for GLint
 #include <string>
 
 namespace JAZZROS {
@@ -61,7 +62,7 @@ public:
     const float             frameRate() const;
     const bool              alphaChannel() const;
     const AVPixelFormat     getPixFormat() const;
-//ros:    static void             getGLPixFormats(const AVPixelFormat pixFmt, GLint & outInternalTexFmt, GLint & outPixFmt);
+    static void             getGLPixFormats(const AVPixelFormat pixFmt, GLint & outInternalTexFmt, GLint & outPixFmt);
     //
     const unsigned long     duration_ms() const;
     //
