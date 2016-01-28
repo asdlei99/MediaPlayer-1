@@ -78,6 +78,8 @@ VideoVectorBuffer::alloc(const FFmpegFileHolder * pHolder)
             const size_t    partOfPhysicMemorySizeInBytes = floor((double)getMemorySize() / 4.0); // could return 0
             const size_t    available_frame_nb = partOfPhysicMemorySizeInBytes > 0 ? (std::min<size_t>(20, floor((double)partOfPhysicMemorySizeInBytes / (double)m_frameSize))) : 20;
 
+            av_log(NULL, AV_LOG_INFO, "Video allocs m_frameSize[%d] available_frame_nb[%d]\n",m_frameSize,available_frame_nb);
+
             m_pool.alloc(m_frameSize, available_frame_nb);
 
             av_log(NULL, AV_LOG_INFO, "Video allocs pool for %d frames\n", m_pool.FrameCount());

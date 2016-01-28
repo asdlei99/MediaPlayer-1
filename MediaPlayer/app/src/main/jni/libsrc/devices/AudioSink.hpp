@@ -13,13 +13,13 @@ namespace JAZZROS {
 
         virtual bool playing() const = 0;
 
-        virtual double getDelay() const;
+        virtual double getDelay() const = 0;
 
-        virtual void setDelay(const double delay);
+        virtual void setDelay(const double delay) = 0;
 
-        virtual void setVolume(float);
+        virtual void setVolume(float) = 0;
 
-        virtual float getVolume() const;
+        virtual float getVolume() const = 0;
     };
 } // namespace JAZZROS
 

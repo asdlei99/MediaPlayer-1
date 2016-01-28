@@ -12,7 +12,7 @@
 namespace JAZZROS {
 
 // This parameter should be incremented each time before commit to repository
-#define OSG_FFMPEG_PLUGIN_RELEASE_VERSION_INT   11
+#define JAZZROS_FFMPEG_LIBRARY_RELEASE_VERSION_INT   10
 
 
 template <class T>
@@ -25,6 +25,7 @@ class FFmpegPlayer: public ImageStream, public OpenThreads::Thread
 public:
                                 FFmpegPlayer();
                                 FFmpegPlayer(const FFmpegPlayer & player);
+    virtual                     ~FFmpegPlayer();
 
 
     bool                        open(const std::string & filename,
@@ -68,7 +69,6 @@ private:
     typedef TScopedLock<Mutex>      ScopedLock;
     typedef OpenThreads::Condition  Condition;
 
-    virtual                     ~FFmpegPlayer();
     virtual void                run();
     virtual void                applyLoopingMode();
 
@@ -79,6 +79,14 @@ private:
     void                        cmdPause();
     void                        cmdRewind();
     void                        cmdSeek(double time);
+
+    virtual void setImage(const unsigned short &width, const unsigned short &height,
+                          const int &someInt,
+                          const GLint &interanlTexFormat,
+                          const GLint &pixFormat,
+                          unsigned char *pFramePtr);
+    virtual const size_t s() const;
+    virtual const size_t t() const;
 
     FFmpegFileHolder            m_fileHolder;
     FFmpegStreamer              m_streamer;

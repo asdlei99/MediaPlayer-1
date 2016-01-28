@@ -14,11 +14,13 @@ import android.widget.TextView;
 
 import com.jazzros.ffmpegtest.enums.PlayState;
 
-public class FFMpegAV extends Activity
+import org.libsdl.app.SDLActivity;
+
+public class FFMpegAV extends SDLActivity
 {
     private final static String 	TAG = "FFMpegAV";
 
-    private AVView 					mVideoView;
+    private FFMpegView  			mVideoView;
     private Boolean                 goFullScreen = false;
     private ActPreferences          mPrefs;
 
@@ -72,8 +74,9 @@ public class FFMpegAV extends Activity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
 
-        mVideoView = (AVView)findViewById(R.id.video);
-        mVideoView.setTextView((TextView) findViewById(R.id.text));
+
+        mVideoView = (FFMpegView)findViewById(R.id.video);
+//        mVideoView.setTextView((TextView) findViewById(R.id.text));
 
         mVideoView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -150,6 +153,8 @@ public class FFMpegAV extends Activity
         mVideoView.requestLayout();
     }
 
+    public static native int nativeInit(Object arguments);
+
     static {
         System.loadLibrary("avutil");
         System.loadLibrary("swresample");
@@ -157,6 +162,8 @@ public class FFMpegAV extends Activity
         System.loadLibrary("avcodec");
         System.loadLibrary("avformat");
         System.loadLibrary("avdevice");
+
+        System.loadLibrary("SDL2");
 
         System.loadLibrary("avjni");
     }

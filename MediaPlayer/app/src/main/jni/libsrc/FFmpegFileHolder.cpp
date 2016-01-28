@@ -92,20 +92,26 @@ FFmpegFileHolder::getGLPixFormats (const AVPixelFormat pixFmt, GLint & outIntern
             outPixFmt = GL_RGB;
             break;
         }
-        /* ros:
         case AV_PIX_FMT_BGR24:
         {
             outInternalTexFmt = GL_RGB;
+#ifdef ANDROID
+            outPixFmt = GL_RGB;
+#else
             outPixFmt = GL_BGR;
+#endif
             break;
         }
         case AV_PIX_FMT_BGRA:
         {
             outInternalTexFmt = GL_RGBA;
+#ifdef ANDROID
+            outPixFmt = GL_RGBA;
+#else
             outPixFmt = GL_BGRA;
+#endif
             break;
         }
-         */
         case AV_PIX_FMT_RGBA:
         {
             outInternalTexFmt = GL_RGBA;

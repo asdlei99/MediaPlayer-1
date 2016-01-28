@@ -83,6 +83,7 @@ FFmpegVideoReader::openFile(const char *filename,
     //
     // Parse options
     //
+    // todo: it much simply to avoid CRASH for case when \parameters eq to NULL
     long                    scaledWidth = 0;
     long                    scaledHeight = 0;
     size_t                  threadNb = 0; // By default - autodetect thread number

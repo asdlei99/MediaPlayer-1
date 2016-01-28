@@ -15,7 +15,7 @@ FFmpegPlayer::FFmpegPlayer() :
 {
 //ros:    setOrigin(osg::Image::TOP_LEFT);
 
-    std::auto_ptr<CommandQueue> commands(new CommandQueue);
+    std::auto_ptr<CommandQueue> commands(new CommandQueue); // todo: why here need auto_ptr<>?
 
     m_commands = commands.release();
 }
@@ -25,7 +25,7 @@ FFmpegPlayer::FFmpegPlayer() :
 FFmpegPlayer::FFmpegPlayer(const FFmpegPlayer & image) :
     ImageStream(image)
 {
-    // todo: probably incorrect or incomplete
+    // todo: probably incorrect or incomplete. Maybe it will be better to hide copy constructor?
 }
 
 
@@ -40,7 +40,7 @@ FFmpegPlayer::~FFmpegPlayer()
 
     // release athe audio streams to make sure that the decoder doesn't retain any external
     // refences.
-    getAudioStreams().clear();
+    getAudioStreams().clear(); // todo: I guess these objects should be deleted before clear()
 
     delete m_commands;
 
@@ -49,7 +49,7 @@ FFmpegPlayer::~FFmpegPlayer()
 
 bool FFmpegPlayer::open(const std::string & filename, FFmpegParameters* parameters)
 {
-    av_log(NULL, AV_LOG_INFO, "FFmpeg plugin release version: %d", OSG_FFMPEG_PLUGIN_RELEASE_VERSION_INT);
+    av_log(NULL, AV_LOG_INFO, "FFmpeg plugin release version: %d", JAZZROS_FFMPEG_LIBRARY_RELEASE_VERSION_INT);
     av_log(NULL, AV_LOG_INFO, "OS physical RAM size: %d MB", getMemorySize() / 1000000);
 
     setFileName(filename);
@@ -81,8 +81,7 @@ bool FFmpegPlayer::open(const std::string & filename, FFmpegParameters* paramete
 
         setPixelAspectRatio(m_fileHolder.pixelAspectRatio());
 
-        // OSG_NOTICE<<"ffmpeg::open("<<filename<<") size("<<s()<<", "<<t()<<") aspect ratio "<<m_fileHolder.pixelAspectRatio()<<std::endl;
-        av_log(NULL, AV_LOG_INFO, "ffmpeg::open( %s ) size(%d, %d) aspect ratio %f",
+        av_log(NULL, AV_LOG_INFO, "File( %s ) size(%d, %d) aspect ratio %f",
                filename.c_str(),
                s(),t(),
                m_fileHolder.pixelAspectRatio());
@@ -94,7 +93,6 @@ bool FFmpegPlayer::open(const std::string & filename, FFmpegParameters* paramete
     // If audio exist...
     if (m_fileHolder.isHasAudio())
     {
-        //OSG_NOTICE<<"Attaching FFmpegAudioStream"<<std::endl;
         av_log(NULL, AV_LOG_INFO, "Attaching FFmpegAudioStream");
 
         getAudioStreams().push_back(new FFmpegAudioStream(& m_fileHolder, & m_streamer));
@@ -223,6 +221,7 @@ bool FFmpegPlayer::isImageTranslucent() const
 
 void FFmpegPlayer::run()
 {
+    av_log(NULL, AV_LOG_INFO, "Start FFmpegPlayer::run()");
     try
     {
         Mutex       lockMutex;
@@ -367,6 +366,27 @@ void FFmpegPlayer::cmdSeek(double time)
     //
     const unsigned long ul_time = time;
     m_streamer.seek(ul_time);
+}
+
+void FFmpegPlayer::setImage(const unsigned short &width, const unsigned short &height,
+                      const int &someInt,
+                      const GLint &interanlTexFormat,
+                      const GLint &pixFormat,
+                      unsigned char *pFramePtr)
+{
+    av_log(NULL, AV_LOG_INFO, "setImage(%d,%d)", // todo: that's all?
+            width, height);
+}
+
+
+const size_t FFmpegPlayer::s() const
+{
+    return 100; // todo: really?
+}
+
+const size_t FFmpegPlayer::t() const
+{
+    return 100; // todo: really?
 }
 
 } // namespace JAZZROS
