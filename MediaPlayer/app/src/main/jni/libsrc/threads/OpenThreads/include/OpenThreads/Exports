@@ -5,6 +5,8 @@
 #ifndef WIN32
 	#define OPENTHREAD_EXPORT_DIRECTIVE
 #else
+	#define OPENTHREAD_EXPORT_DIRECTIVE
+/* ros: Do not use it as library at all
 	#ifdef OPENTHREADS_EXPORTS
 		#define OPENTHREAD_EXPORT_DIRECTIVE __declspec(dllexport)
 	#else
@@ -18,6 +20,7 @@
 		#endif
 		#endif
 	#endif
+*/
 #endif
 
 #endif

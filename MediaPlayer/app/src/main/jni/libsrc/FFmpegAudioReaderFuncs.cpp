@@ -151,6 +151,10 @@ const int   gPlayerPause()
     gPlayer.pause();
     return 0;
 }
+void        gPlayerQuit()
+{
+    gPlayer.quit();
+}
 const int   gGetPlayerStatus()
 {
     switch (gPlayer.get_status()) {

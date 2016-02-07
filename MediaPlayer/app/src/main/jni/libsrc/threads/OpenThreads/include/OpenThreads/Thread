@@ -180,7 +180,9 @@ public:
      *
      *  @return 0 if normal, -1 if errno set, errno code otherwise.
      */
-//    virtual int cancel();
+#ifndef ANDROID
+    virtual int cancel();
+#endif // ANDROID
 
     // ros: added for compilation
     static int microSleep( unsigned int microsec);

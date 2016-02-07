@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="console" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="bin/Debug/test1" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Option parameters='&quot;E:\Video\Serenity - HD DVD Trailer.mp4&quot;' />
+				<Compiler>
+					<Add option="-g" />
+				</Compiler>
+			</Target>
+			<Target title="Release">
+				<Option output="bin/Release/test1" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Release/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+			<Add option="-D__STDC_CONSTANT_MACROS" />
+			<Add option="-D_WIN32_WINNT=0x0501" />
+			<Add directory="E:/SDK/SDL/SDL2-devel-2.0.4-mingw/SDL2-2.0.4/i686-w64-mingw32/include/SDL2" />
+			<Add directory="E:/SDK/FFMPEG/ffmpeg-2.7-win32-dev/include" />
+			<Add directory="E:/PROJECTS/CPP/TESTS/SDL/test1/libsrc/threads/OpenThreads/include" />
+			<Add directory="E:/SDK/pthread/Pre-built.2/include" />
+		</Compiler>
+		<Linker>
+			<Add option="-lmingw32 -lSDL2main -lSDL2 -lpthreadGC2" />
+			<Add library="libavcodec.dll.a" />
+			<Add library="libavdevice.dll.a" />
+			<Add library="libavfilter.dll.a" />
+			<Add library="libavformat.dll.a" />
+			<Add library="libavutil.dll.a" />
+			<Add library="libswresample.dll.a" />
+			<Add library="libswscale.dll.a" />
+			<Add directory="E:/SDK/SDL/SDL2-devel-2.0.4-mingw/SDL2-2.0.4/i686-w64-mingw32/lib" />
+			<Add directory="E:/SDK/FFMPEG/ffmpeg-2.7-win32-dev/lib" />
+			<Add directory="E:/SDK/pthread/Pre-built.2/lib/x86" />
+		</Linker>
+		<Unit filename="libsrc/FFmpegAudioReaderFuncs.cpp" />
+		<Unit filename="libsrc/FFmpegFileHolder.cpp" />
+		<Unit filename="libsrc/FFmpegFileHolder.hpp" />
+		<Unit filename="libsrc/FFmpegHeaders.hpp" />
+		<Unit filename="libsrc/FFmpegParameters.cpp" />
+		<Unit filename="libsrc/FFmpegParameters.hpp" />
+		<Unit filename="libsrc/FFmpegPlayer.cpp" />
+		<Unit filename="libsrc/FFmpegPlayer.hpp" />
+		<Unit filename="libsrc/SDLAudioSink.cpp" />
+		<Unit filename="libsrc/SDLAudioSink.h" />
+		<Unit filename="libsrc/buffers/AudioBuffer.cpp" />
+		<Unit filename="libsrc/buffers/AudioBuffer.hpp" />
+		<Unit filename="libsrc/buffers/VideoVectorBuffer.cpp" />
+		<Unit filename="libsrc/buffers/VideoVectorBuffer.hpp" />
+		<Unit filename="libsrc/devices/AudioSink.hpp" />
+		<Unit filename="libsrc/devices/AudioStream.hpp" />
+		<Unit filename="libsrc/devices/ImageStream.hpp" />
+		<Unit filename="libsrc/devices/VideoOutputDevice.cpp" />
+		<Unit filename="libsrc/devices/VideoOutputDevice.hpp" />
+		<Unit filename="libsrc/devices/VideoOutputDeviceData.hpp" />
+		<Unit filename="libsrc/devices/VideoOutputDeviceGL.cpp" />
+		<Unit filename="libsrc/devices/VideoOutputDeviceGL.hpp" />
+		<Unit filename="libsrc/devices/VideoOutputDeviceSDL.cpp" />
+		<Unit filename="libsrc/devices/VideoOutputDeviceSDL.hpp" />
+		<Unit filename="libsrc/readers/FFmpegAudioReader.cpp" />
+		<Unit filename="libsrc/readers/FFmpegAudioReader.hpp" />
+		<Unit filename="libsrc/readers/FFmpegIExternalDecoder.hpp" />
+		<Unit filename="libsrc/readers/FFmpegVideoReader.cpp" />
+		<Unit filename="libsrc/readers/FFmpegVideoReader.hpp" />
+		<Unit filename="libsrc/readers/FFmpegWrapper.cpp" />
+		<Unit filename="libsrc/readers/FFmpegWrapper.hpp" />
+		<Unit filename="libsrc/streams/FFmpegAudioStream.cpp" />
+		<Unit filename="libsrc/streams/FFmpegAudioStream.hpp" />
+		<Unit filename="libsrc/streams/FFmpegILibAvStreamImpl.hpp" />
+		<Unit filename="libsrc/streams/FFmpegLibAvStreamImpl.cpp" />
+		<Unit filename="libsrc/streams/FFmpegLibAvStreamImpl.hpp" />
+		<Unit filename="libsrc/streams/FFmpegStreamer.cpp" />
+		<Unit filename="libsrc/streams/FFmpegStreamer.hpp" />
+		<Unit filename="libsrc/system/FFmpegTimer.cpp" />
+		<Unit filename="libsrc/system/FFmpegTimer.hpp" />
+		<Unit filename="libsrc/system/MessageQueue.hpp" />
+		<Unit filename="libsrc/system/System_routine.cpp" />
+		<Unit filename="libsrc/system/Timer.cpp" />
+		<Unit filename="libsrc/system/Timer.h" />
+		<Unit filename="libsrc/threads/FFmpegRenderThread.cpp" />
+		<Unit filename="libsrc/threads/FFmpegRenderThread.hpp" />
+		<Unit filename="libsrc/threads/OpenThreads/include/OpenThreads/Barrier" />
+		<Unit filename="libsrc/threads/OpenThreads/include/OpenThreads/Condition" />
+		<Unit filename="libsrc/threads/OpenThreads/include/OpenThreads/Exports" />
+		<Unit filename="libsrc/threads/OpenThreads/include/OpenThreads/Mutex" />
+		<Unit filename="libsrc/threads/OpenThreads/include/OpenThreads/Thread" />
+		<Unit filename="libsrc/threads/OpenThreads/pthread_src/PThreadBarrierPrivateData.h" />
+		<Unit filename="libsrc/threads/OpenThreads/pthread_src/PThreadConditionPrivateData.h" />
+		<Unit filename="libsrc/threads/OpenThreads/pthread_src/PThreadMutexPrivateData.h" />
+		<Unit filename="libsrc/threads/OpenThreads/pthread_src/PThreadPrivateData.h" />
+		<Unit filename="libsrc/threads/OpenThreads/win32_src/WIN32Condition.cpp" />
+		<Unit filename="libsrc/threads/OpenThreads/win32_src/Win32BarrierPrivateData.h" />
+		<Unit filename="libsrc/threads/OpenThreads/win32_src/Win32Condition.h" />
+		<Unit filename="libsrc/threads/OpenThreads/win32_src/Win32ConditionPrivateData.h" />
+		<Unit filename="libsrc/threads/OpenThreads/win32_src/Win32Mutex.cpp" />
+		<Unit filename="libsrc/threads/OpenThreads/win32_src/Win32MutexPrivateData.h" />
+		<Unit filename="libsrc/threads/OpenThreads/win32_src/Win32Thread.cpp" />
+		<Unit filename="libsrc/threads/OpenThreads/win32_src/Win32ThreadBarrier.cpp" />
+		<Unit filename="libsrc/threads/OpenThreads/win32_src/Win32ThreadPrivateData.h" />
+		<Unit filename="libsrc/threads/ScopedLock.h" />
+		<Unit filename="libsrc/threads/ThreadLock.h" />
+		<Unit filename="src/avjni.c">
+			<Option compilerVar="CC" />
+			<Option target="&lt;{~None~}&gt;" />
+		</Unit>
+		<Unit filename="src/com_jazzros_ffmpegtest_RendererWrapper.h" />
+		<Unit filename="src/game.c">
+			<Option compilerVar="CC" />
+			<Option target="&lt;{~None~}&gt;" />
+		</Unit>
+		<Unit filename="src/game.h">
+			<Option target="&lt;{~None~}&gt;" />
+		</Unit>
+		<Unit filename="src/sdl_main.cpp" />
+		<Extensions>
+			<code_completion />
+			<envvars />
+			<debugger />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

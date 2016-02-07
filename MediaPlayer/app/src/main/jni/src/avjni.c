@@ -34,6 +34,7 @@ const int   gAudioReaderGetSamples(unsigned long * msTime,
 const int   gPlayerOpen(const char * mfileName);
 const int   gPlayerPlay();
 const int   gPlayerPause();
+void        gPlayerQuit();
 const int   gGetPlayerStatus(); // 0: paused, 1: run
 //
 // ros:

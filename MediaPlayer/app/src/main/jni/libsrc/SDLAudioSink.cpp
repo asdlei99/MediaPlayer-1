@@ -1,6 +1,7 @@
 #include "SDLAudioSink.h"
 #include "devices/AudioStream.hpp"
 #include <string>
+#include <stdio.h>
 
 #define  LOG_TAG    "SDL"
 

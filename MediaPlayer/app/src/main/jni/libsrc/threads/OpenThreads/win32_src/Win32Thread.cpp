@@ -10,11 +10,11 @@
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-// 
+//
 
 //
 // Win32Thread.c++ - C++ Thread class built on top of posix threads.
@@ -98,7 +98,7 @@ namespace OpenThreads {
 		// good way to set this, as Win32Thread_setschedparam is mostly a no-op.
 		//
 		static int SetThreadSchedulingParams(Thread *data) {
-			
+
 			Thread *thread = static_cast<Thread *>(data);
 
 			Win32ThreadPrivateData *pd =
@@ -115,16 +115,16 @@ namespace OpenThreads {
 				break;
 			case Thread::PRIORITY_NOMINAL:
 				prio = THREAD_PRIORITY_NORMAL;
-				break;   
+				break;
 			case Thread::PRIORITY_LOW:
 				prio = THREAD_PRIORITY_BELOW_NORMAL;
-				break;       
+				break;
 			case Thread::PRIORITY_MIN:
 				prio = THREAD_PRIORITY_IDLE;
-				break;   
+				break;
 			}
 			int status = SetThreadPriority( pd->tid , prio);
-			PrintThreadSchedulingInfo(thread);   
+			PrintThreadSchedulingInfo(thread);
 
 			return status!=0;
 		};
@@ -145,6 +145,19 @@ Thread* Thread::CurrentThread()
 int Thread::SetConcurrency(int) {
     return -1;
 };
+
+// ros:
+int Thread::microSleep(unsigned int microsec)
+{
+#ifndef ANDROID
+	//return ::usleep(microsec);
+	Sleep(microsec/1000);
+	return 0;
+#else
+	::usleep(microsec);
+    return 0;
+#endif
+}
 
 //----------------------------------------------------------------------------
 //
@@ -187,7 +200,7 @@ Thread::Thread() {
 
     pd->threadPolicy = SCHEDULE_DEFAULT;
 
-	pd->detached = false; 
+	pd->detached = false;
 
     _prvData = static_cast<void *>(pd);
 
@@ -209,7 +222,7 @@ Thread::~Thread() {
     delete pd;
 }
 //-----------------------------------------------------------------------------
-// 
+//
 // Description: Initialize Threading
 //
 // Use: public.
@@ -280,7 +293,7 @@ int Thread::start() {
 
 }
 
-int Thread::startThread() 
+int Thread::startThread()
 { return start(); }
 
 //-----------------------------------------------------------------------------
@@ -291,7 +304,7 @@ int Thread::startThread()
 //
 int Thread::join() {
     Win32ThreadPrivateData *pd = static_cast<Win32ThreadPrivateData *> (_prvData);
-	if( pd->detached ) 
+	if( pd->detached )
 		return -1; // cannot wait for detached ;
 
 	if( WaitForSingleObject(pd->tid,INFINITE) != WAIT_OBJECT_0)
@@ -305,7 +318,7 @@ int Thread::join() {
 int Thread::detach()
 {
     Win32ThreadPrivateData *pd = static_cast<Win32ThreadPrivateData *> (_prvData);
-	pd->detached = true; 
+	pd->detached = true;
 	return 0;
 }
 
@@ -325,7 +338,7 @@ int Thread::cancel() {
 
 	// wait for 5 sec
 	if( (pd->cancelMode == 1) || WaitForSingleObject(pd->tid, 5000) != WAIT_OBJECT_0)
-	{	
+	{
 		// did not terminate cleanly force termination
 		return TerminateThread(pd->tid,(DWORD)-1);
 	}
@@ -333,7 +346,7 @@ int Thread::cancel() {
 }
 
 
-
+/* ros:
 int Thread::testCancel()
 {
     Win32ThreadPrivateData *pd = static_cast<Win32ThreadPrivateData *> (_prvData);
@@ -353,7 +366,7 @@ int Thread::testCancel()
 	return 0;
 
 }
-
+*/
 
 
 //-----------------------------------------------------------------------------
@@ -403,9 +416,9 @@ int Thread::setSchedulePriority(ThreadPriority priority) {
 
     pd->threadPriority = priority;
 
-    if(pd->isRunning) 
+    if(pd->isRunning)
 		return ThreadPrivateActions::SetThreadSchedulingParams(this);
-    else 
+    else
 		return 0;
 }
 
@@ -432,9 +445,9 @@ int Thread::setSchedulePolicy(ThreadPolicy policy) {
 
     pd->threadPolicy = policy;
 
-    if(pd->isRunning) 
+    if(pd->isRunning)
 		return ThreadPrivateActions::SetThreadSchedulingParams(this);
-    else 
+    else
 		return 0;
 }
 

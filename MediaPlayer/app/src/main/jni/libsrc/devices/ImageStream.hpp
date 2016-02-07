@@ -5,9 +5,11 @@
 #include <string>
 #include "AudioStream.hpp"
 
-//#define GLint   int
-//#include <GL/gl.h>
-#include <GLES2/gl2.h>
+#ifdef ANDROID
+    #include <GLES2/gl2.h>
+#else // ANDROID
+    #include <GL/gl.h>
+#endif // ANDROID
 
 namespace JAZZROS {
 

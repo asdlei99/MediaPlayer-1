@@ -28,11 +28,11 @@ Timer* Timer::instance()
         else
         {
             _secsPerTick = 1.0;
-            notify(NOTICE)<<"Error: Timer::Timer() unable to use QueryPerformanceFrequency, "<<std::endl;
-            notify(NOTICE)<<"timing code will be wrong, Windows error code: "<<GetLastError()<<std::endl;
+            //notify(NOTICE)<<"Error: Timer::Timer() unable to use QueryPerformanceFrequency, "<<std::endl;
+            //notify(NOTICE)<<"timing code will be wrong, Windows error code: "<<GetLastError()<<std::endl;
         }
-       
-        setStartTick();       
+
+        setStartTick();
     }
 
     Timer_t Timer::tick() const
@@ -44,8 +44,8 @@ Timer* Timer::instance()
         }
         else
         {
-            notify(NOTICE)<<"Error: Timer::Timer() unable to use QueryPerformanceCounter, "<<std::endl;
-            notify(NOTICE)<<"timing code will be wrong, Windows error code: "<<GetLastError()<<std::endl;
+            //notify(NOTICE)<<"Error: Timer::Timer() unable to use QueryPerformanceCounter, "<<std::endl;
+            //notify(NOTICE)<<"timing code will be wrong, Windows error code: "<<GetLastError()<<std::endl;
             return 0;
         }
     }
@@ -57,7 +57,7 @@ Timer* Timer::instance()
     {
         _secsPerTick = (1.0 / (double) 1000000);
 
-        setStartTick();       
+        setStartTick();
     }
 
     #if defined(_POSIX_TIMERS) && ( _POSIX_TIMERS > 0 ) && defined(_POSIX_MONOTONIC_CLOCK)

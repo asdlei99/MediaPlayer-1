@@ -29,7 +29,7 @@ namespace JAZZROS {
 #ifdef ANDROID
                     outPixFmt = GL_RGB;
 #else
-                    outPixFmt = GL_BGR;
+                    outPixFmt = GL_RGB;
 #endif
                     break;
                 }
@@ -38,7 +38,7 @@ namespace JAZZROS {
 #ifdef ANDROID
                     outPixFmt = GL_RGBA;
 #else
-                    outPixFmt = GL_BGRA;
+                    outPixFmt = GL_RGBA;
 #endif
                     break;
                 }
