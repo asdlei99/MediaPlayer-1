@@ -55,8 +55,6 @@ public:
     void                    close ();
     //
     const long              videoIndex() const;
-    const unsigned short    width() const;
-    const unsigned short    height() const;
     const float             pixelAspectRatio() const;
     const float             frameRate() const;
     const bool              alphaChannel() const;

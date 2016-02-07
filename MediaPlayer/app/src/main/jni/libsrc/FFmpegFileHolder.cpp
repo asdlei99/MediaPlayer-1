@@ -23,18 +23,6 @@ FFmpegFileHolder::audioIndex() const
     return m_audioIndex;
 }
 
-const unsigned short
-FFmpegFileHolder::width() const
-{
-    return m_frameSize.Width;
-}
-
-const unsigned short
-FFmpegFileHolder::height() const
-{
-    return m_frameSize.Height;
-}
-
 const float
 FFmpegFileHolder::pixelAspectRatio() const
 {
