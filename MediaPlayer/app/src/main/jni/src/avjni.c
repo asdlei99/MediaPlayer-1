@@ -682,6 +682,7 @@ int nativePlayerOpen(const char* mfileName)
 //    avcodec_init();
     av_register_all();
     avcodec_register_all();
+    avdevice_register_all();
     av_log_set_callback (log_default_callback);
 
     __android_log_print(ANDROID_LOG_INFO, "com.jazzros.ffmpegtest", "test file %s", mfileName);

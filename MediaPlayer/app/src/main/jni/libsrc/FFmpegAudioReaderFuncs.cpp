@@ -6,10 +6,14 @@ JAZZROS::FFmpegAudioReader*  gAudioReader;
 
 #include "FFmpegParameters.hpp"
 #include "FFmpegPlayer.hpp"
+#include "devices/VideoOutputDeviceSDL.hpp"
+#include "devices/VideoOutputDeviceGL.hpp"
+
 
 #include "SDLAudioSink.h"
 
-JAZZROS::FFmpegPlayer       gPlayer;
+JAZZROS::FFmpegPlayer           gPlayer;
+JAZZROS::VideoOutputDeviceSDL   gOutputDevice;
 
 extern "C"
 {
@@ -112,9 +116,13 @@ const int gAudioReaderGetSamples(unsigned long * msTime,
 
 const int   gPlayerOpen(const char * pFileName)
 {
+
+
     JAZZROS::FFmpegParameters * parameters = new JAZZROS::FFmpegParameters();
+///    av_dict_set(parameters->getOptions(), "video_size", "1280:720", 0);
+//    av_dict_set(parameters->getOptions(), "video_size", "2048:2048", 0);
     //
-    if (gPlayer.open(pFileName, parameters) == true) {
+    if (gPlayer.open(pFileName, parameters, & gOutputDevice) == true) {
 
         /**
          * After player's method open() has been through successfully, it's object contains

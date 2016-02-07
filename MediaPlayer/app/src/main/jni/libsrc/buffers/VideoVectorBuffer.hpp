@@ -96,7 +96,7 @@ public:
                             VideoVectorBuffer();
                             ~VideoVectorBuffer();
 
-    const int               alloc(const FFmpegFileHolder * pHolder);
+    const int               alloc(const FFmpegFileHolder * pHolder, const unsigned int & frameMemSize);
     void                    flush();
     void                    release();
     void                    writeFrame(const unsigned int & flag, const size_t & drop_frame_nb);

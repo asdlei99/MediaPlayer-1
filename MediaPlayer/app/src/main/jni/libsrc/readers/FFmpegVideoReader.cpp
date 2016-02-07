@@ -6,6 +6,11 @@
 #include <string>
 #include <stdexcept>
 
+
+void (*draw_interrupter)(unsigned char *, int,
+                         unsigned char *, int,
+                         unsigned char *, int) = NULL;
+
 namespace JAZZROS {
 
 #ifdef USE_SWSCALE
@@ -20,6 +25,7 @@ FFmpegVideoReader::FFmpegVideoReader():m_use_actual_duration(false){}
 const int
 FFmpegVideoReader::openFile(const char *filename,
                             FFmpegParameters * parameters,
+                            const AVPixelFormat & outPixFmt,
                             float & aspectRatio,
                             float & frame_rate,
                             bool & par_alphaChannel)
@@ -33,20 +39,21 @@ FFmpegVideoReader::openFile(const char *filename,
     //
     m_videoStreamIndex                  = -1;
     m_FirstFrame                        = true;
+#ifdef USE_SWSCALE
     img_convert_ctx                     = NULL;
+#endif // USE_SWSCALE
     m_pSeekFrame                        = NULL;
     m_pSrcFrame                         = NULL;
     m_is_video_duration_determined      = 0;
     m_video_duration                    = 0;
     m_pExtDecoder                       = NULL;
-    m_pixelFormat                       = PIX_FMT_BGR24; // Default value for case w/o HW acceleration
+//    m_pixelFormat                       = AV_PIX_FMT_BGR24; // Default value for case w/o HW acceleration
+//    m_pixelFormat                       = AV_PIX_FMT_RGB565LE;
+//    m_pixelFormat                       = AV_PIX_FMT_YUV420P;
+    m_pixelFormat                       = outPixFmt;
 
     if (std::string(filename).compare(0, 5, "/dev/")==0)
     {
-#ifdef ANDROID
-        av_log(NULL, AV_LOG_ERROR, "Device not supported on Android");
-        return -1;
-#else
         avdevice_register_all();
 
         if (parameters)
@@ -60,14 +67,12 @@ FFmpegVideoReader::openFile(const char *filename,
 
         if (iformat)
         {
-            av_log (NULL, AV_LOG_INFO/*todo: maybe fatal error?*/, "Found input format: %s", format);
+            av_log (NULL, AV_LOG_INFO/*todo: maybe fatal error?*/, "Found input format: %s", format.c_str());
         }
         else
         {
-            av_log (NULL, AV_LOG_INFO/*todo: maybe fatal error?*/, "Failed to find input format: %s", format);
+            av_log (NULL, AV_LOG_INFO/*todo: maybe fatal error?*/, "Failed to find input format: %s", format.c_str());
         }
-
-#endif
     }
     else
     {
@@ -294,6 +299,18 @@ FFmpegVideoReader::openFile(const char *filename,
     frame_rate          = get_fps();
     par_alphaChannel    = alphaChannel();
 
+
+    float lumaGBlur = 0.0f;
+    float chromaGBlur = 0.0f;
+    float lumaSharpen = 0.0f;
+    float chromaSharpen = 0.0f;
+    float chromaHShift = 0.0f;
+    float chromaVShift = 0.0f;
+    int verbose = 0;
+    m_dst_sw_filter = sws_getDefaultFilter(lumaGBlur, chromaGBlur,
+                                    lumaSharpen, chromaSharpen,
+                                    chromaHShift, chromaVShift,
+                                    verbose);
     return 0;
 }
 
@@ -319,6 +336,10 @@ FFmpegVideoReader::close(void)
     {
         sws_freeContext(img_convert_ctx);
         img_convert_ctx = NULL;
+    }
+    if (m_dst_sw_filter)
+    {
+        sws_freeFilter(m_dst_sw_filter);
     }
 #endif
     if (m_fmt_ctx_ptr)
@@ -691,66 +712,59 @@ FFmpegVideoReader::grabNextFrame(uint8_t * buffer, double & timeStampInSec, cons
     unsigned long       packetPos;
     int                 rezValue    = -1;
     AVCodecContext *    pCodecCtx   = m_fmt_ctx_ptr->streams[m_videoStreamIndex]->codec;
-    AVFrame *           pFrameRGB   = JRFFMPEG_ALLOC_FRAME();
-    if(pFrameRGB == NULL)
-    {
-        return -1;
-    }
-    pFrameRGB->width = m_new_width;
-    pFrameRGB->height = m_new_height;
     //
 
-    // Assign appropriate parts of buffer to image planes in pFrameRGB
-//    avpicture_fill ((AVPicture *)pFrameRGB, buffer, m_pixelFormat, m_new_width, m_new_height);
 const double            timer_0_ms      = now_micros();
     if (GetNextFrame(pCodecCtx, m_pSrcFrame, packetPos, timeStampInSec, drop_frame_nb, decodeTillMinReqTime, minReqTimeMS))
     {
+
 const double            timer_1_ms      = now_micros();
 
-        ConvertToRGB(m_pSrcFrame, buffer, NULL);
-
-const double            timer_2_ms      = now_micros();
-static size_t   statistic_counter = 0;
-static size_t   statistic_counter_nb = 100;
-static int      statistic_GetNextFrame_sum = 0;
-static int      statistic_GetNextFrame_max = 0;
-static int      statistic_ImgScale_sum = 0;
-static int      statistic_ImgScale_max = 0;
-if (statistic_counter < statistic_counter_nb)
-{
-    const int GetNextFrame_ms = (int)(timer_1_ms - timer_0_ms);
-    const int ImgScale_ms = (int)(timer_2_ms - timer_1_ms);
-    //
-    statistic_GetNextFrame_sum += GetNextFrame_ms;
-    statistic_GetNextFrame_max = std::max(statistic_GetNextFrame_max, GetNextFrame_ms);
-    //
-    statistic_ImgScale_sum += ImgScale_ms;
-    statistic_ImgScale_max = std::max(statistic_ImgScale_max, ImgScale_ms);
-    //
-    statistic_counter++;
-    //
-    if (statistic_counter == statistic_counter_nb)
-    {
-        av_log(NULL, AV_LOG_DEBUG, "Statistics:");
-        av_log(NULL, AV_LOG_DEBUG, " GetNextFrame avg/max [ms]: %d/%d", (int)((double)statistic_GetNextFrame_sum / (double)statistic_counter), statistic_GetNextFrame_max);
-        av_log(NULL, AV_LOG_DEBUG, " Frame Scale avg/max [ms]: %d/%d", (int)((double)statistic_ImgScale_sum / (double)statistic_counter), statistic_ImgScale_max);
-        statistic_counter = 0;
-        statistic_GetNextFrame_sum = 0;
-        statistic_GetNextFrame_max = 0;
-        statistic_ImgScale_sum = 0;
-        statistic_ImgScale_max = 0;
-        statistic_counter_nb *= 2;
-    }
-}
-/*
-av_log(NULL, AV_LOG_DEBUG, "GetNextFrame + sws_scale spent %3d %3d ms Time: %4d ms DTMRT: %d(%4d)", (int)(timer_1_ms - timer_0_ms), (int)(timer_2_ms - timer_1_ms), (int)(timeStampInSec*1000),
-         decodeTillMinReqTime ? 1 : 0,
-         (int)minReqTimeMS);
-*/
         rezValue = 0;
+        if (ConvertToRGB(m_pSrcFrame, buffer, NULL) != 0) {
+            av_log(NULL, AV_LOG_ERROR, "ERROR: ConvertToRGB");
+            rezValue = -1;
+        }
+const double            timer_2_ms      = now_micros();
+/*
+        static size_t   statistic_counter = 0;
+        static size_t   statistic_counter_nb = 100;
+        static int      statistic_GetNextFrame_sum = 0;
+        static int      statistic_GetNextFrame_max = 0;
+        static int      statistic_ImgScale_sum = 0;
+        static int      statistic_ImgScale_max = 0;
+        if (statistic_counter < statistic_counter_nb)
+        {
+            const int GetNextFrame_ms = (int)(timer_1_ms - timer_0_ms);
+            const int ImgScale_ms = (int)(timer_2_ms - timer_1_ms);
+            //
+            statistic_GetNextFrame_sum += GetNextFrame_ms;
+            statistic_GetNextFrame_max = std::max(statistic_GetNextFrame_max, GetNextFrame_ms);
+            //
+            statistic_ImgScale_sum += ImgScale_ms;
+            statistic_ImgScale_max = std::max(statistic_ImgScale_max, ImgScale_ms);
+            //
+            statistic_counter++;
+            //
+            if (statistic_counter == statistic_counter_nb)
+            {
+                av_log(NULL, AV_LOG_DEBUG, "Statistics:");
+                av_log(NULL, AV_LOG_DEBUG, " GetNextFrame avg/max [ms]: %d/%d", (int)((double)statistic_GetNextFrame_sum / (double)statistic_counter), statistic_GetNextFrame_max);
+                av_log(NULL, AV_LOG_DEBUG, " Frame Scale avg/max [ms]: %d/%d", (int)((double)statistic_ImgScale_sum / (double)statistic_counter), statistic_ImgScale_max);
+                statistic_counter = 0;
+                statistic_GetNextFrame_sum = 0;
+                statistic_GetNextFrame_max = 0;
+                statistic_ImgScale_sum = 0;
+                statistic_ImgScale_max = 0;
+                statistic_counter_nb *= 2;
+            }
+        }
+*/
+    }
+    else {
+        av_log(NULL, AV_LOG_ERROR, "ERROR: GetNextFrame() return false");
     }
     //
-    JRFFMPEG_FREE_FRAME  (& pFrameRGB);
     return rezValue;
 }
 
@@ -909,58 +923,66 @@ FFmpegVideoReader::ConvertToRGB(AVFrame * pSrcFrame, uint8_t * prealloc_buffer, 
 {
     AVCodecContext *  pCodecCtx = m_fmt_ctx_ptr->streams[m_videoStreamIndex]->codec;
 
+    if (prealloc_buffer != NULL
+            && ptrRGBmap == NULL
+            && pCodecCtx->pix_fmt == m_pixelFormat
+            && pCodecCtx->width == m_new_width
+            && pCodecCtx->height == m_new_height
+            && draw_interrupter != NULL) {
+
+        draw_interrupter( pSrcFrame->data[0], pSrcFrame->linesize[0],
+                          pSrcFrame->data[1], pSrcFrame->linesize[1],
+                          pSrcFrame->data[2], pSrcFrame->linesize[2]);
+        return 0;
+    }
+
     const int   rgbFrameSize    = avpicture_get_size(m_pixelFormat, m_new_width, m_new_height);
-    AVFrame *   pFrameRGB       = JRFFMPEG_ALLOC_FRAME();
-
-    if(pFrameRGB==NULL)
-        return -1;
-
-    pFrameRGB->width = m_new_width;
-    pFrameRGB->height = m_new_height;
-    pFrameRGB->format = m_pixelFormat;
+    AVPicture   pFrameRGB;
 
     // Determine required buffer size and allocate buffer
     uint8_t *   buffer          = (prealloc_buffer == NULL) ? (uint8_t*)av_malloc(rgbFrameSize) : prealloc_buffer;
 
-    // Assign appropriate parts of buffer to image planes in pFrameRGB
-    avpicture_fill((AVPicture *)pFrameRGB, buffer, m_pixelFormat, m_new_width, m_new_height);
+    if (avpicture_fill(&pFrameRGB, buffer, m_pixelFormat, m_new_width, m_new_height) != rgbFrameSize)
+    {
+        av_log(NULL, AV_LOG_ERROR, "ERROR: avpicture_fill()");
+        return -2;
+    }
+
     //
     // Convert the image into necessary format
     if (m_pExtDecoder != NULL)
     {
-        if (m_pExtDecoder->Convert(pSrcFrame, pFrameRGB) < 0)
+        if (m_pExtDecoder->Convert(pSrcFrame, & pFrameRGB) < 0)
             return -1;
     }
     else
     {
 #ifdef USE_SWSCALE
+        img_convert_ctx = sws_getCachedContext(img_convert_ctx, pCodecCtx->width, pCodecCtx->height, pCodecCtx->pix_fmt,
+                                               m_new_width, m_new_height, m_pixelFormat,
+                                               SWS_JAZZROS_CONVERSION_TYPE, NULL, m_dst_sw_filter, NULL);
         if(img_convert_ctx == NULL)
         {
-            img_convert_ctx = sws_getContext(pCodecCtx->width, pCodecCtx->height, pCodecCtx->pix_fmt,
-                                            m_new_width, m_new_height, m_pixelFormat,
-                                            SWS_JAZZROS_CONVERSION_TYPE, NULL, NULL, NULL);
-            if(img_convert_ctx == NULL)
-            {
-                if (prealloc_buffer == NULL)
-                    av_free(buffer);
+            if (prealloc_buffer == NULL)
+                av_free(buffer);
 
-                JRFFMPEG_FREE_FRAME (& pFrameRGB);
-
-                av_log(NULL, AV_LOG_ERROR, "Cannot initialize the video conversion context!");
-                return -1;
-            }
+            av_log(NULL, AV_LOG_ERROR, "Cannot initialize the video conversion context!");
+            return -1;
         }
-        sws_scale(img_convert_ctx, pSrcFrame->data,
+
+        if (sws_scale(img_convert_ctx, (const uint8_t* const*)pSrcFrame->data,
                   pSrcFrame->linesize, 0,
                   pCodecCtx->height,
-                  pFrameRGB->data, pFrameRGB->linesize);
+                  pFrameRGB.data, pFrameRGB.linesize) != m_new_height) {
+            av_log(NULL, AV_LOG_ERROR, "ERROR: sws_scale()");
+        }
 #else
-        img_convert(pFrameRGB->data, m_pixelFormat,
+        img_convert(pFrameRGB.data, m_pixelFormat,
                     pSrcFrame->data, pCodecCtx->pix_fmt,
                     pCodecCtx->width, pCodecCtx->height);
 #endif
         if (ptrRGBmap != NULL)
-            memcpy (ptrRGBmap, pFrameRGB->data[0], rgbFrameSize);
+            memcpy (ptrRGBmap, pFrameRGB.data[0], rgbFrameSize);
     }
 
 
@@ -968,7 +990,6 @@ FFmpegVideoReader::ConvertToRGB(AVFrame * pSrcFrame, uint8_t * prealloc_buffer, 
     //
     if (prealloc_buffer == NULL)
         av_free(buffer);
-    JRFFMPEG_FREE_FRAME (& pFrameRGB);
 
     return 0;
 }

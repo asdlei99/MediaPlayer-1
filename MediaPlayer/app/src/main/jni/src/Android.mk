@@ -31,10 +31,13 @@ LOCAL_SRC_FILES += ../libsrc/streams/FFmpegStreamer.cpp
 LOCAL_SRC_FILES += ../libsrc/streams/FFmpegLibAvStreamImpl.cpp
 LOCAL_SRC_FILES += ../libsrc/streams/FFmpegAudioStream.cpp
 LOCAL_SRC_FILES += ../libsrc/FFmpegPlayer.cpp
+LOCAL_SRC_FILES += ../libsrc/devices/VideoOutputDevice.cpp
+LOCAL_SRC_FILES += ../libsrc/devices/VideoOutputDeviceGL.cpp
+LOCAL_SRC_FILES += ../libsrc/devices/VideoOutputDeviceSDL.cpp
 LOCAL_SRC_FILES += avjni.c
 LOCAL_SRC_FILES += game.c
 
-LOCAL_CFLAGS    := -D__unix__
+LOCAL_CFLAGS    := -D__unix__ -DANDROID
 
 # LOCAL_LDLIBS := -llog -ljnigraphics -lz -landroid
 LOCAL_LDLIBS += -llog -lz -ljnigraphics -lGLESv2 -lGLESv1_CM

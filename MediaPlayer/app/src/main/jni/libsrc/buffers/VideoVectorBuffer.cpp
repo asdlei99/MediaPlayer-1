@@ -48,7 +48,7 @@ VideoVectorBuffer::flush()
 }
 
 const int
-VideoVectorBuffer::alloc(const FFmpegFileHolder * pHolder)
+VideoVectorBuffer::alloc(const FFmpegFileHolder * pHolder, const unsigned int & frameMemSize)
 {
     if (pHolder == NULL)
         return -1;
@@ -73,10 +73,11 @@ VideoVectorBuffer::alloc(const FFmpegFileHolder * pHolder)
         {
             ScopedLock  lock (m_mutex);
 
-            m_frameSize = avpicture_get_size(pHolder->getPixFormat(), pHolder->width(), pHolder->height());
+            m_frameSize = frameMemSize;
 
             const size_t    partOfPhysicMemorySizeInBytes = floor((double)getMemorySize() / 4.0); // could return 0
-            const size_t    available_frame_nb = partOfPhysicMemorySizeInBytes > 0 ? (std::min<size_t>(20, floor((double)partOfPhysicMemorySizeInBytes / (double)m_frameSize))) : 20;
+//            const size_t    available_frame_nb = partOfPhysicMemorySizeInBytes > 0 ? (std::min<size_t>(20, floor((double)partOfPhysicMemorySizeInBytes / (double)m_frameSize))) : 20;
+            const size_t    available_frame_nb = partOfPhysicMemorySizeInBytes > 0 ? (std::min<size_t>(5, floor((double)partOfPhysicMemorySizeInBytes / (double)m_frameSize))) : 5;
 
             av_log(NULL, AV_LOG_INFO, "Video allocs m_frameSize[%d] available_frame_nb[%d]\n",m_frameSize,available_frame_nb);
 
@@ -352,9 +353,10 @@ VideoVectorBuffer::writeFrame(const unsigned int & flag, const size_t & drop_fra
     const short result = FFmpegWrapper::getNextImage (m_fileIndex,
                                                     m_pool.m_ptr[loc_bufferGrabPtrStart],
                                                     timeStampSec,
-                                                    drop_frame_nb,
-                                                    (flag & 1) ? false : true,
-                                                    m_forcedFrameTimeMS);
+                                                    drop_frame_nb,//0
+                                                    (flag & 1) ? false : true,//true
+                                                    m_forcedFrameTimeMS//-1.0
+                                                    );
 
 
     if (result == 0)

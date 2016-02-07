@@ -2,7 +2,6 @@
 #define HEADER_GUARD_FFMPEG_FILEHOLDER_H
 
 #include "FFmpegHeaders.hpp"
-#include "devices/ImageStream.hpp" // for GLint
 #include <string>
 
 namespace JAZZROS {
@@ -52,7 +51,7 @@ class FFmpegFileHolder
 
 public:
                             FFmpegFileHolder();
-    const short             open (const std::string & filename, FFmpegParameters* parameters);
+    const short             open (const std::string & filename, FFmpegParameters* parameters, const AVPixelFormat & askUsePixFmt);
     void                    close ();
     //
     const long              videoIndex() const;
@@ -61,8 +60,8 @@ public:
     const float             pixelAspectRatio() const;
     const float             frameRate() const;
     const bool              alphaChannel() const;
-    const AVPixelFormat     getPixFormat() const;
-    static void             getGLPixFormats(const AVPixelFormat pixFmt, GLint & outInternalTexFmt, GLint & outPixFmt);
+    const AVPixelFormat     getPixFormat2() const;
+    const Size              getFrameSize() const;
     //
     const unsigned long     duration_ms() const;
     //

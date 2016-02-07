@@ -15,6 +15,7 @@ private:
     int                 m_bytesRemaining;
 #ifdef USE_SWSCALE
     struct SwsContext * img_convert_ctx;
+    SwsFilter *         m_dst_sw_filter;
 #endif
     AVRational          m_framerate;
     AVPacket            m_packet;
@@ -46,7 +47,7 @@ public:
                         FFmpegVideoReader();
     //
     // Search index of video-stream. If no one video-stream had not been found, return error.
-    const int           openFile(const char *filename, FFmpegParameters * parameters, float & aspectRatio, float & frame_rate, bool & alphaChannel);
+    const int           openFile(const char *filename, FFmpegParameters * parameters, const AVPixelFormat & outPixFmt, float & aspectRatio, float & frame_rate, bool & alphaChannel);
     void                close(void);
     /*fast seek may find keyframe, but not asked time and little less than ask*/
     int                 fast_nonaccurate_seek(int64_t & timestamp/*milliseconds*/, unsigned char * ptrRGBmap);

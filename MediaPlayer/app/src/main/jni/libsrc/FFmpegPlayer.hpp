@@ -9,6 +9,10 @@
 #include "streams/FFmpegStreamer.hpp"
 #include "devices/ImageStream.hpp"
 
+extern void (*draw_interrupter)(unsigned char *, int,
+                                 unsigned char *, int,
+                                 unsigned char *, int);
+
 namespace JAZZROS {
 
 // This parameter should be incremented each time before commit to repository
@@ -20,6 +24,8 @@ class MessageQueue;
 
 class FFmpegParameters;
 
+class VideoOutputDevice;
+
 class FFmpegPlayer: public ImageStream, public OpenThreads::Thread
 {
 public:
@@ -29,7 +35,8 @@ public:
 
 
     bool                        open(const std::string & filename,
-                                        FFmpegParameters* parameters);
+                                        FFmpegParameters* parameters,
+                                        VideoOutputDevice * pVOD);
 
     virtual void                play();
     virtual void                pause();
@@ -51,6 +58,9 @@ public:
     virtual double              getFrameRate() const;
 
     virtual bool                isImageTranslucent() const;
+
+    const VideoOutputDevice *   getVOD() const {return m_pVOD;}
+    VideoOutputDevice *         getVOD() {return m_pVOD;}
 
 private:
     void                        close();
@@ -94,6 +104,8 @@ private:
     CommandQueue *              m_commands;
     Condition                   m_commandQueue_cond;
     double                      m_seek_time;
+
+    VideoOutputDevice *         m_pVOD;
 };
 
 } // namespace JAZZROS

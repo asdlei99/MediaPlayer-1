@@ -25,8 +25,19 @@ const double now_micros(void) {
 
     struct timespec res;
     clock_gettime(CLOCK_REALTIME, &res);
-    return 1000.0 * res.tv_sec + (double) res.tv_nsec / 1e3;
+/*
+    struct timeval delta;
+    gettimeofday(&delta, NULL);
 
+    res.tv_sec = delta.tv_sec;
+    res.tv_nsec = delta.tv_usec * 1000;
+*/
+    if (res.tv_nsec > 1000000000) {
+        res.tv_sec += 1;
+        res.tv_nsec -= 1000000000;
+    }
+
+    return 1000.0 * res.tv_sec + (double) res.tv_nsec / 1e3;
 }
 
 const int
@@ -57,12 +68,6 @@ FFmpegAudioReader::openFile(const char *filename, FFmpegParameters * parameters)
     //
     if (std::string(filename).compare(0, 5, "/dev/")==0)
     {
-#ifdef ANDROID // todo: actually - No problem with ANDROID
-
-        av_log(NULL, AV_LOG_ERROR, "Device not supported on Android");
-
-        return -1;
-#else
         avdevice_register_all();
 
         if (parameters)
@@ -82,8 +87,6 @@ FFmpegAudioReader::openFile(const char *filename, FFmpegParameters * parameters)
         {
             av_log(NULL, AV_LOG_INFO, "Failed to find input format: %s", format.c_str());
         }
-
-#endif
     }
     else
     {

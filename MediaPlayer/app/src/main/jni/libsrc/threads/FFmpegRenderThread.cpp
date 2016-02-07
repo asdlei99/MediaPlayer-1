@@ -12,11 +12,11 @@ FFmpegRenderThread::~FFmpegRenderThread()
 }
 
 const int
-FFmpegRenderThread::Initialize(FFmpegILibAvStreamImpl * pSrc, ImageStream * pDst, const FFmpegFileHolder * pFileHolder)
+FFmpegRenderThread::Initialize(FFmpegILibAvStreamImpl * pSrc, VideoOutputDevice * pDst, const FFmpegFileHolder * pFileHolder)
 {
     m_pFileHolder   = pFileHolder;
     m_pLibAvStream  = pSrc;
-    m_pImgStream    = pDst;
+    m_pOutputDevice    = pDst;
 
     if (pSrc == NULL || pDst == NULL)
         return -1;
@@ -61,10 +61,6 @@ FFmpegRenderThread::run()
         double                  dist_frame_ms;
         int                     iErr;
         //
-        GLint                   internalTexFmt;
-        GLint                   pixFmt;
-        FFmpegFileHolder::getGLPixFormats (m_pFileHolder->getPixFormat(), internalTexFmt, pixFmt);
-        //
         while (m_renderingThreadStop == false)
         {
             //
@@ -94,21 +90,9 @@ FFmpegRenderThread::run()
                         Thread::microSleep(1000 * dist_frame_ms / 2);
                     }
                 }
-                /*
-ros:
-                    m_pImgStream->setImage(
-                    m_pFileHolder->width(),
-                    m_pFileHolder->height(),
-                    1, internalTexFmt, pixFmt, GL_UNSIGNED_BYTE,
-                    pFramePtr, osg::Image::NO_DELETE
-                );
-                */
-                m_pImgStream->setImage(
-                        m_pFileHolder->width(),
-                        m_pFileHolder->height(),
-                        1, internalTexFmt, pixFmt,
-                        pFramePtr
-                );
+
+                m_pOutputDevice->render(pFramePtr);
+
 
                 tick_start_ms = loopTimer.time_m();
             }

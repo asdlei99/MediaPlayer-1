@@ -2,6 +2,7 @@
 #include "../readers/FFmpegWrapper.hpp"
 #include "../FFmpegPlayer.hpp"
 #include "../devices/AudioSink.hpp"
+#include "../devices/VideoOutputDevice.hpp"
 #include <limits>
 #include <stdexcept>
 
@@ -89,7 +90,8 @@ FFmpegLibAvStreamImpl::initialize(const FFmpegFileHolder * pHolder, FFmpegPlayer
     {
         m_frame_rate = pHolder->frameRate();
 
-        if (m_video_buffer.alloc(pHolder) < 0)
+        if (m_video_buffer.alloc(pHolder,
+                                 m_pPlayer->getVOD()->getData()->getMemoeryFrameSize()) < 0)
         {
             m_video_buffer.release();
             m_videoIndex = -1;
@@ -98,7 +100,7 @@ FFmpegLibAvStreamImpl::initialize(const FFmpegFileHolder * pHolder, FFmpegPlayer
         else
         {
             if (m_renderer.Initialize (this,
-                                    m_pPlayer,
+                                    m_pPlayer->getVOD(),
                                     pHolder) < 0)
             {
                 m_video_buffer.release();

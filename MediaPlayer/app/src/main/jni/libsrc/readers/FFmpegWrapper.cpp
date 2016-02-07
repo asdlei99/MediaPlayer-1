@@ -40,7 +40,7 @@ FFmpegWrapper::openVideo(const char * pFileName,
     FFmpegVideoReader* media = new FFmpegVideoReader();
     try
     {
-        int ret = media->openFile(pFileName, parameters, aspectRatio, frame_rate, alphaChannel);
+        int ret = media->openFile(pFileName, parameters, outPixFmt, aspectRatio, frame_rate, alphaChannel);
         if (ret == 0)
         {
             outPixFmt = media->getPixFmt();

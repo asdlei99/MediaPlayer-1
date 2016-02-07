@@ -72,61 +72,18 @@ FFmpegFileHolder::getAudioFormat() const
 }
 
 const AVPixelFormat
-FFmpegFileHolder::getPixFormat() const
+FFmpegFileHolder::getPixFormat2() const
 {
     return m_pixFmt;
 }
-
-
-void
-FFmpegFileHolder::getGLPixFormats (const AVPixelFormat pixFmt, GLint & outInternalTexFmt, GLint & outPixFmt)
+const Size
+FFmpegFileHolder::getFrameSize() const
 {
-    outInternalTexFmt   = GL_RGB;
-    outPixFmt           = GL_RGB;
-
-    switch (pixFmt)
-    {
-        case AV_PIX_FMT_RGB24:
-        {
-            outInternalTexFmt = GL_RGB;
-            outPixFmt = GL_RGB;
-            break;
-        }
-        case AV_PIX_FMT_BGR24:
-        {
-            outInternalTexFmt = GL_RGB;
-#ifdef ANDROID
-            outPixFmt = GL_RGB;
-#else
-            outPixFmt = GL_BGR;
-#endif
-            break;
-        }
-        case AV_PIX_FMT_BGRA:
-        {
-            outInternalTexFmt = GL_RGBA;
-#ifdef ANDROID
-            outPixFmt = GL_RGBA;
-#else
-            outPixFmt = GL_BGRA;
-#endif
-            break;
-        }
-        case AV_PIX_FMT_RGBA:
-        {
-            outInternalTexFmt = GL_RGBA;
-            outPixFmt = GL_RGBA;
-            break;
-        }
-        default:
-        {
-            av_log(NULL, AV_LOG_WARNING, "Cannot find GL pix format for libav pix format");
-        }
-    };
+    return m_frameSize;
 }
 
 const short
-FFmpegFileHolder::open (const std::string & filename, FFmpegParameters* parameters)
+FFmpegFileHolder::open (const std::string & filename, FFmpegParameters* parameters, const AVPixelFormat & askUsePixFmt)
 {
     if (m_audioIndex < 0 && m_videoIndex < 0)
     {
@@ -160,6 +117,7 @@ FFmpegFileHolder::open (const std::string & filename, FFmpegParameters* paramete
         m_frameSize.Width                   = 640;  // default
         m_frameSize.Height                  = 480;  // values
         m_alpha_channel                     = false;
+        m_pixFmt                            = askUsePixFmt;
 
         m_videoIndex = FFmpegWrapper::openVideo(filename.c_str(),
                                                 parameters,

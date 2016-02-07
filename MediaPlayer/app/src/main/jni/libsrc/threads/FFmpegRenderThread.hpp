@@ -3,7 +3,7 @@
 
 #include <OpenThreads/Thread>
 #include "../FFmpegFileHolder.hpp"
-#include "../devices/ImageStream.hpp"
+#include "../devices/VideoOutputDevice.hpp"
 
 namespace JAZZROS {
 
@@ -16,7 +16,7 @@ class FFmpegFileHolder;
 
 class FFmpegRenderThread : protected OpenThreads::Thread
 {
-    ImageStream                 * m_pImgStream;
+    VideoOutputDevice           * m_pOutputDevice;
     FFmpegILibAvStreamImpl      * m_pLibAvStream;
     const FFmpegFileHolder      * m_pFileHolder;
     volatile bool               m_renderingThreadStop;
@@ -26,7 +26,7 @@ public:
 
     virtual                     ~FFmpegRenderThread();
 
-    const int                   Initialize(FFmpegILibAvStreamImpl *, ImageStream *, const FFmpegFileHolder * pFileHolder);
+    const int                   Initialize(FFmpegILibAvStreamImpl *, VideoOutputDevice *, const FFmpegFileHolder * pFileHolder);
 
     void                        Start();
     void                        Stop();

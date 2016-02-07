@@ -32,9 +32,7 @@ extern "C" {
 	#include <libavutil/channel_layout.h> // Appears to be needed specifically for versions on some Linux distros
 #endif
 
-#ifndef ANDROID // todo: actually android works well without any @(un)defines
 #include <libavdevice/avdevice.h>
-#endif
 
 #include <libavutil/mathematics.h>
 #include <libavutil/parseutils.h>

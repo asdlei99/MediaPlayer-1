@@ -53,9 +53,7 @@ void FFmpegParameters::parse(const std::string& name, const std::string& value)
     }
     if (name == "format")
     {
-#ifndef ANDROID // todo: actually Android works well
         avdevice_register_all();
-#endif
         m_format = av_find_input_format(value.c_str());
 /* ros:
         if (!m_format)

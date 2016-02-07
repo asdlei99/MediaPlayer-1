@@ -2,6 +2,9 @@
 #include "FFmpegParameters.hpp"
 #include "streams/FFmpegAudioStream.hpp"
 
+#include "devices/VideoOutputDevice.hpp"
+#include "devices/VideoOutputDeviceData.hpp"
+
 #include "threads/ScopedLock.h"
 
 #include <memory>
@@ -11,7 +14,7 @@ size_t getMemorySize();
 namespace JAZZROS {
 
 FFmpegPlayer::FFmpegPlayer() :
-    m_commands(0)
+    m_commands(0),m_pVOD(NULL)
 {
 //ros:    setOrigin(osg::Image::TOP_LEFT);
 
@@ -47,15 +50,28 @@ FFmpegPlayer::~FFmpegPlayer()
     av_log(NULL, AV_LOG_INFO, "Destructed FFmpegPlayer");
 }
 
-bool FFmpegPlayer::open(const std::string & filename, FFmpegParameters* parameters)
+bool FFmpegPlayer::open(const std::string & filename, FFmpegParameters* parameters, VideoOutputDevice * pVOD)
 {
     av_log(NULL, AV_LOG_INFO, "FFmpeg plugin release version: %d", JAZZROS_FFMPEG_LIBRARY_RELEASE_VERSION_INT);
     av_log(NULL, AV_LOG_INFO, "OS physical RAM size: %d MB", getMemorySize() / 1000000);
 
     setFileName(filename);
 
-    if (m_fileHolder.open(filename, parameters) < 0)
+    m_pVOD = pVOD;
+
+    if (m_fileHolder.open(filename, parameters, m_pVOD->getData()->getFFPixelFormat()) < 0)
         return false;
+
+    /**
+     * We need initialize video output device before open streamer and after holder has been opened
+     */
+    if (m_fileHolder.videoIndex() >= 0) {
+        if (m_pVOD->Initialize(m_fileHolder) != 0) {
+            av_log(NULL, AV_LOG_ERROR, "ERROR: Cannot initialize video output device");
+            m_fileHolder.close();
+            return false;
+        }
+    }
 
     if (m_streamer.open(& m_fileHolder, this) < 0)
     {
@@ -65,19 +81,7 @@ bool FFmpegPlayer::open(const std::string & filename, FFmpegParameters* paramete
     // If video exist...
     if (m_fileHolder.videoIndex() >= 0)
     {
-        GLint                   internalTexFmt;
-        GLint                   pixFmt;
-        FFmpegFileHolder::getGLPixFormats (m_fileHolder.getPixFormat(), internalTexFmt, pixFmt);
-/*
-        setImage(
-            m_fileHolder.width(), m_fileHolder.height(), 1, internalTexFmt, pixFmt, GL_UNSIGNED_BYTE,
-            const_cast<unsigned char *>(m_streamer.getFrame()), NO_DELETE
-        );
-*/
-        setImage(
-                m_fileHolder.width(), m_fileHolder.height(), 1, internalTexFmt, pixFmt,
-                const_cast<unsigned char *>(m_streamer.getFrame())
-        );
+        m_pVOD->render(m_streamer.getFrame());
 
         setPixelAspectRatio(m_fileHolder.pixelAspectRatio());
 
@@ -372,21 +376,27 @@ void FFmpegPlayer::setImage(const unsigned short &width, const unsigned short &h
                       const int &someInt,
                       const GLint &interanlTexFormat,
                       const GLint &pixFormat,
-                      unsigned char *pFramePtr)
-{
-    av_log(NULL, AV_LOG_INFO, "setImage(%d,%d)", // todo: that's all?
-            width, height);
+                      unsigned char *pFramePtr) {
+    // Nothing to do
 }
 
 
 const size_t FFmpegPlayer::s() const
 {
-    return 100; // todo: really?
+    if (m_pVOD) {
+        const Size frameSize = m_pVOD->getData()->getFrameSize();
+        return frameSize.Width;
+    }
+    return 100;
 }
 
 const size_t FFmpegPlayer::t() const
 {
-    return 100; // todo: really?
+    if (m_pVOD) {
+        const Size frameSize = m_pVOD->getData()->getFrameSize();
+        return frameSize.Height;
+    }
+    return 100;
 }
 
 } // namespace JAZZROS

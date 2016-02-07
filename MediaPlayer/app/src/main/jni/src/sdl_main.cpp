@@ -46,7 +46,7 @@
 #endif
 
 #include <string>
-
+#include "../libsrc/FFmpegPlayer.hpp"
 
 struct myData {
     SDL_Window *window;
@@ -239,23 +239,53 @@ struct my_struct {
     SDL_Texture *bitmapTex;
 };
 
+my_struct   gdata;
+SDL_Renderer *renderer = NULL;
+SDL_Texture *bitmapTex = NULL;
+
+void SDL_setImage(const unsigned short &width, const unsigned short &height,
+                  const int &someInt,
+                  const GLint &interanlTexFormat,
+                  const GLint &pixFormat,
+                  unsigned char *pFramePtr) {
+/*
+    void *mPixels = NULL;
+    int mPitch = 0;
+
+    SDL_LockTexture(gdata.bitmapTex, NULL, reinterpret_cast<void **>(&mPixels), &mPitch);
+    //SDL_memcpy(mPixels, gdata.pixels, gdata.w * gdata.h * 3);
+    SDL_memcpy(mPixels, pFramePtr, gdata.w * gdata.h * 3);
+    SDL_UnlockTexture(gdata.bitmapTex);
+
+*/
+/*
+    int frame_size = gdata.w * gdata.h * 12/8;
+
+    memcpy (gdata.pixels, pFramePtr, frame_size);
+*/
+}
+
+// https://forums.libsdl.org/viewtopic.php?t=9898
+unsigned char * gplane0; int gplane0s;
+unsigned char * gplane1; int gplane1s;
+unsigned char * gplane2; int gplane2s;
+void SDL_updateYUVTexture(unsigned char * plane0, int plane0s,
+                          unsigned char * plane1, int plane1s,
+                          unsigned char * plane2, int plane2s) {
+
+    gplane0 = plane0;
+    gplane1 = plane1;
+    gplane2 = plane2;
+    gplane0s = plane0s;
+    gplane1s = plane1s;
+    gplane2s = plane2s;
+}
+
 void my_function(void *param) {
+/*
     my_struct *my_param = (my_struct *) param;
     //
-    unsigned char step = 5;
-    my_param->red += step;
-    my_param->green += step;
-    my_param->blue += step;
-    for (int y = 0; y < my_param->h / 2; y++) {
-        for (int x = 0; x < my_param->w / 2; x++) {
-            //colors from http://www.conservativespace.com/ColorPicker.php
-            //Color AARRGGBB
-            //pixels[x+(y*w)] = color;
-            my_param->pixels[(x + (y * my_param->w)) * 3 + 0] = my_param->red;
-            my_param->pixels[(x + (y * my_param->w)) * 3 + 1] = my_param->green;
-            my_param->pixels[(x + (y * my_param->w)) * 3 + 2] = my_param->blue;
-        }
-    }
+    int frame_size = gdata.w * gdata.h * 12/8;
     //
     //
     //
@@ -263,32 +293,16 @@ void my_function(void *param) {
     int mPitch = 0;
 
     SDL_LockTexture(my_param->bitmapTex, NULL, reinterpret_cast<void **>(&mPixels), &mPitch);
-    SDL_memcpy(mPixels, my_param->pixels, my_param->w * my_param->h * 3);
+    SDL_memcpy(mPixels, my_param->pixels, frame_size);
     SDL_UnlockTexture(my_param->bitmapTex);
-}
+*/
 
-
-/* with the same code as before: */
-Uint32 my_callbackfunc(Uint32 interval, void *param)
-{
-    SDL_Event event;
-    SDL_UserEvent userevent;
-
-    /* In this example, our callback pushes a function
-    into the queue, and causes our callback to be called again at the
-    same interval: */
-
-    userevent.type = SDL_USEREVENT;
-    userevent.code = 0;
-//    userevent.data1 = &my_function;
-    userevent.data1 = (void *)(& my_function);
-    userevent.data2 = param;
-
-    event.type = SDL_USEREVENT;
-    event.user = userevent;
-
-    SDL_PushEvent(&event);
-    return(interval);
+/*
+    SDL_UpdateYUVTexture(bitmapTex, NULL,
+                         gplane0, gplane0s,
+                         gplane1, gplane1s,
+                         gplane2, gplane2s);
+*/
 }
 
 #ifdef __cplusplus
@@ -317,8 +331,6 @@ int main( int argc, char *argv[] ) {
     #define JAZZROS
 
     SDL_Window *window = NULL;
-    SDL_Renderer *renderer = NULL;
-    SDL_Texture *bitmapTex = NULL;
     // SDL_Surface *bitmapSurface = NULL;
 
     int running = 1;
@@ -328,45 +340,19 @@ int main( int argc, char *argv[] ) {
     SDL_Init(SDL_INIT_EVERYTHING | SDL_INIT_TIMER);
 
     if (argc > 1) {
+//        draw_interrupter = SDL_updateYUVTexture;
+
         LOG("nativePlayerOpen(%s)", argv[1]);
         nativePlayerOpen(argv[1]);
 
         gPlayerPlay();
     }
-
-    window = SDL_CreateWindow("SDL Hello World",
-                              SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-                              640, 480, SDL_WINDOW_SHOWN);
-
-    renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
-
-    const unsigned int w = 100;
-    const unsigned int h = 100;
-
-    unsigned char *pixels = new unsigned char[w*h*3];
-
-    bitmapTex = SDL_CreateTexture(renderer,SDL_PIXELFORMAT_RGB24, SDL_TEXTUREACCESS_STREAMING/*texture will be able modifying*/,w,h);
-
-    my_struct   data;
-    data.bitmapTex = bitmapTex;
-    data.red = 0;
-    data.green = 128;
-    data.blue = 255;
-    data.w = w;
-    data.h = h;
-    data.pixels = pixels;
-    //
-    Uint32 delay = (33 / 10) * 10;  /* To round it down to the nearest 10 ms */
-    SDL_TimerID my_timer_id = SDL_AddTimer(delay, my_callbackfunc, & data);
     //
     while (running) {
         SDL_Event event;
 
-        SDL_RenderClear(renderer);
-        SDL_RenderCopy(renderer, bitmapTex, NULL, NULL);
-        SDL_RenderPresent(renderer);
-
         while (SDL_PollEvent(&event)) {
+
             switch (event.type) {
                 case SDL_KEYDOWN : {
                     switch (event.key.keysym.scancode) {
@@ -384,8 +370,11 @@ int main( int argc, char *argv[] ) {
                 }
                 case SDL_USEREVENT : {
                     /* and now we can call the function we wanted to call in the timer but couldn't because of the multithreading problems */
+
                     void (*p)(void *) = (void (*)(void *)) event.user.data1;
-                    p(event.user.data2);
+                    if (p)
+                        p(event.user.data2);
+
                     break;
                 }
             }
@@ -394,9 +383,9 @@ int main( int argc, char *argv[] ) {
 
     LOG("finished");
 
-    SDL_DestroyTexture(bitmapTex);
-    SDL_DestroyRenderer(renderer);
-    SDL_DestroyWindow(window);
+//    SDL_DestroyTexture(bitmapTex);
+//    SDL_DestroyRenderer(renderer);
+//    SDL_DestroyWindow(window);
     SDL_Quit();
 
     return 0;

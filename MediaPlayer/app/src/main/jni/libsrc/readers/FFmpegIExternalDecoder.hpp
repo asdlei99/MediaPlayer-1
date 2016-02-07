@@ -14,7 +14,7 @@ public:
 
     virtual AVCodec*            openCodec(AVCodecContext* pCodec, AVStream *) = 0;
 
-    virtual const int           Convert(AVFrame * pSrcFrame, AVFrame * pDstFrame) = 0;
+    virtual const int           Convert(AVFrame * pSrcFrame, AVPicture * pDstFrame) = 0;
 
     virtual const AVPixelFormat GetOutPixFmt(void) const = 0;
 
