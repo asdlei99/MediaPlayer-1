@@ -22,7 +22,7 @@ namespace JAZZROS {
 
         const VideoOutputDeviceData * getData() const;
 
-        virtual const int       render(const unsigned char * pFrame) = 0;
+        virtual const int       render(const unsigned char * pFrame) const = 0;
 
     }; // class VideoOutputDevice
 

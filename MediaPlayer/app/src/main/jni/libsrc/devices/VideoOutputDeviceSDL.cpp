@@ -94,7 +94,7 @@ namespace JAZZROS {
     }
 
     struct sParam {
-        VideoOutputDeviceSDL * pThis;
+        const VideoOutputDeviceSDL * pThis;
         const unsigned char * pFramePtr;
     };
 
@@ -102,7 +102,7 @@ namespace JAZZROS {
 
         sParam * param = (sParam *)pParam;
 
-        VideoOutputDeviceSDL * pThis = param->pThis;
+        const VideoOutputDeviceSDL * pThis = param->pThis;
 
 
         const VideoOutputDeviceDataSDL * pData     = dynamic_cast<const VideoOutputDeviceDataSDL*>(pThis->getData());
@@ -123,7 +123,7 @@ namespace JAZZROS {
     }
 
     const int
-    VideoOutputDeviceSDL::render(const unsigned char * pFramePtr) {
+    VideoOutputDeviceSDL::render(const unsigned char * pFramePtr) const {
 
         const VideoOutputDeviceDataSDL * pData     = dynamic_cast<const VideoOutputDeviceDataSDL*>(getData());
 

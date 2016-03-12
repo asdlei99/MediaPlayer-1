@@ -94,7 +94,7 @@ private:
                           const int &someInt,
                           const GLint &interanlTexFormat,
                           const GLint &pixFormat,
-                          unsigned char *pFramePtr);
+                          const unsigned char *pFramePtr) const;
     virtual const size_t s() const;
     virtual const size_t t() const;
 

@@ -14,6 +14,7 @@ JAZZROS::FFmpegAudioReader*  gAudioReader;
 
 JAZZROS::FFmpegPlayer           gPlayer;
 JAZZROS::VideoOutputDeviceSDL   gOutputDevice;
+// JAZZROS::VideoOutputDeviceGL   gOutputDevice;
 
 extern "C"
 {
@@ -149,6 +150,13 @@ const int   gPlayerPlay()
 const int   gPlayerPause()
 {
     gPlayer.pause();
+    return 0;
+}
+const int   gPlayerSeek(const double & percent)
+{
+    const double length = gPlayer.getLength();
+    gPlayer.seek(length * percent / 100.0);
+
     return 0;
 }
 void        gPlayerQuit()

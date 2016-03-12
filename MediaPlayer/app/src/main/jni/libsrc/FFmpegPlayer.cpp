@@ -146,8 +146,14 @@ void FFmpegPlayer::rewind()
 
 void FFmpegPlayer::seek(double time)
 {
+    const PlayingStatus prevStatus = get_status();
+
     m_seek_time = time;
     pushCommand(CMD_SEEK);
+
+    // Continue playback if it was playing before seeking
+    if (prevStatus == PLAYING)
+        pushCommand(CMD_PLAY);
 }
 
 
@@ -376,7 +382,7 @@ void FFmpegPlayer::setImage(const unsigned short &width, const unsigned short &h
                       const int &someInt,
                       const GLint &interanlTexFormat,
                       const GLint &pixFormat,
-                      unsigned char *pFramePtr) {
+                      const unsigned char *pFramePtr) const {
     // Nothing to do
 }
 

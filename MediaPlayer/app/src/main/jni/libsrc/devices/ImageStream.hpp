@@ -49,7 +49,7 @@ namespace JAZZROS {
                               const int &someInt,
                               const GLint &interanlTexFormat,
                               const GLint &pixFormat,
-                              unsigned char *pFramePtr) = 0;
+                              const unsigned char *pFramePtr) const = 0;
 
         std::vector<AudioStream *> &getAudioStreams() {
             return m_audio_streams;

@@ -33,9 +33,9 @@
 			<Add option="-Wall" />
 			<Add option="-D__STDC_CONSTANT_MACROS" />
 			<Add option="-D_WIN32_WINNT=0x0501" />
+			<Add directory="libsrc/threads/OpenThreads/include" />
 			<Add directory="E:/SDK/SDL/SDL2-devel-2.0.4-mingw/SDL2-2.0.4/i686-w64-mingw32/include/SDL2" />
 			<Add directory="E:/SDK/FFMPEG/ffmpeg-2.7-win32-dev/include" />
-			<Add directory="E:/PROJECTS/CPP/TESTS/SDL/test1/libsrc/threads/OpenThreads/include" />
 			<Add directory="E:/SDK/pthread/Pre-built.2/include" />
 		</Compiler>
 		<Linker>

@@ -20,7 +20,7 @@ namespace JAZZROS {
 
         virtual const int       Initialize (VideoOutputDeviceData *, const FFmpegFileHolder & );
 
-        virtual const int       render(const unsigned char * pFrame);
+        virtual const int       render(const unsigned char * pFrame) const;
 
     public:
 

@@ -89,7 +89,7 @@ namespace JAZZROS {
     }
 
     const int
-    VideoOutputDeviceGL::render(const unsigned char * pFramePtr) {
+    VideoOutputDeviceGL::render(const unsigned char * pFramePtr) const {
 
         const VideoOutputDeviceDataGL * pData     = dynamic_cast<const VideoOutputDeviceDataGL*>(getData());
 
@@ -101,7 +101,7 @@ namespace JAZZROS {
                     frameSize.Width,
                     frameSize.Height,
                     1, pData->outInternalTexFmt, pData->outPixFmt,
-                    const_cast<unsigned char*>(pFramePtr));
+                    pFramePtr);
             return 0;
         }
         return -1;

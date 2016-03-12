@@ -139,6 +139,7 @@ extern "C" {
 
 const int   gPlayerOpen(const char * mfileName);
 const int   gPlayerPlay();
+const int   gPlayerSeek(const double & percent);
 void        gPlayerQuit();
 
 int nativePlayerOpen(const char* mfileName)
@@ -205,6 +206,27 @@ int main( int argc, char *argv[] ) {
                         }
                         case SDL_SCANCODE_1: {
                             LOG("Pressed button #1");
+                            gPlayerSeek(0.0);
+                            break;
+                        }
+                        case SDL_SCANCODE_2: {
+                            LOG("Pressed button #2");
+                            gPlayerSeek(20.0);
+                            break;
+                        }
+                        case SDL_SCANCODE_3: {
+                            LOG("Pressed button #3");
+                            gPlayerSeek(70.0);
+                            break;
+                        }
+                        case SDL_SCANCODE_4: {
+                            LOG("Pressed button #4");
+                            gPlayerSeek(99.0);
+                            break;
+                        }
+                        case SDL_SCANCODE_5: {
+                            LOG("Pressed button #5");
+                            gPlayerSeek(101.0);
                             break;
                         }
                         case  SDL_SCANCODE_Q: {
