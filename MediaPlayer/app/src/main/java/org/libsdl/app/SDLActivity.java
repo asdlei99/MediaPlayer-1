@@ -342,6 +342,7 @@ public class SDLActivity extends Activity {
     static final int COMMAND_UNUSED = 2;
     static final int COMMAND_TEXTEDIT_HIDE = 3;
     static final int COMMAND_SET_KEEP_SCREEN_ON = 5;
+    static final int COMMAND_QUIT = 6;
 
     protected static final int COMMAND_USER = 0x8000;
 
@@ -355,6 +356,10 @@ public class SDLActivity extends Activity {
      */
     protected boolean onUnhandledMessage(int command, Object param) {
         return false;
+    }
+
+    public static void finishActivity() {
+        mSingleton.sendCommand(COMMAND_QUIT, null);
     }
 
     /**
@@ -398,6 +403,9 @@ public class SDLActivity extends Activity {
                 }
                 break;
             }
+            case COMMAND_QUIT:
+                mSingleton.finish();
+                break;
             default:
                 if ((context instanceof SDLActivity) && !((SDLActivity) context).onUnhandledMessage(msg.arg1, msg.obj)) {
                     Log.e(TAG, "error handling message, command is " + msg.arg1);
@@ -968,6 +976,8 @@ class SDLMain implements Runnable {
     public void run() {
         // Runs SDL_main()
         SDLActivity.nativeInit(SDLActivity.mSingleton.getArguments());
+
+        SDLActivity.finishActivity();
 
         //Log.v("SDL", "SDL thread terminated");
     }

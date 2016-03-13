@@ -1,5 +1,9 @@
 #include "VideoOutputDeviceSDL.hpp"
 
+extern void (*draw_interrupter)(unsigned char *, int,
+                                 unsigned char *, int,
+                                 unsigned char *, int);
+
 namespace JAZZROS {
 
     class VideoOutputDeviceDataSDL : public VideoOutputDeviceData {
@@ -47,8 +51,30 @@ namespace JAZZROS {
         {}
     };
 
+    // https://forums.libsdl.org/viewtopic.php?t=9898
+    unsigned char * gplane0; int gplane0s;
+    unsigned char * gplane1; int gplane1s;
+    unsigned char * gplane2; int gplane2s;
+    void SDL_updateYUVTexture(unsigned char * plane0, int plane0s,
+                              unsigned char * plane1, int plane1s,
+                              unsigned char * plane2, int plane2s) {
+
+        gplane0 = plane0;
+        gplane1 = plane1;
+        gplane2 = plane2;
+        gplane0s = plane0s;
+        gplane1s = plane1s;
+        gplane2s = plane2s;
+    }
+
     VideoOutputDeviceSDL::VideoOutputDeviceSDL()
             : VideoOutputDevice(new VideoOutputDeviceDataSDL()) {
+
+        /*
+            Enable stream-mode.
+            It does not solve sync-issue, but avoid of buffering at all.
+        */
+        // draw_interrupter = SDL_updateYUVTexture;
     }
 
     VideoOutputDeviceSDL::~VideoOutputDeviceSDL() {
@@ -100,22 +126,32 @@ namespace JAZZROS {
 
     void my_function(void *pParam) {
 
-        sParam * param = (sParam *)pParam;
+        sParam *                        param = (sParam *)pParam;
 
-        const VideoOutputDeviceSDL * pThis = param->pThis;
+        const VideoOutputDeviceSDL *    pThis = param->pThis;
 
 
-        const VideoOutputDeviceDataSDL * pData     = dynamic_cast<const VideoOutputDeviceDataSDL*>(pThis->getData());
+        if (draw_interrupter == NULL)
+        {
+            const VideoOutputDeviceDataSDL *    pData     = dynamic_cast<const VideoOutputDeviceDataSDL*>(pThis->getData());
 
-        const unsigned char * pFramePtr = (const unsigned char *)(param->pFramePtr);
+            const unsigned char *               pFramePtr = (const unsigned char *)(param->pFramePtr);
 
-        void *mPixels = NULL;
-        int mPitch = 0;
-        unsigned int frame_size = pData->getMemoeryFrameSize();
+            void *                              mPixels = NULL;
+            int                                 mPitch = 0;
+            unsigned int                        frame_size = pData->getMemoeryFrameSize();
 
-        SDL_LockTexture(pThis->bitmapTex, NULL, reinterpret_cast<void **>(&mPixels), &mPitch);
-        SDL_memcpy(mPixels, pFramePtr, frame_size);
-        SDL_UnlockTexture(pThis->bitmapTex);
+            SDL_LockTexture(pThis->bitmapTex, NULL, reinterpret_cast<void **>(&mPixels), &mPitch);
+            SDL_memcpy(mPixels, pFramePtr, frame_size);
+            SDL_UnlockTexture(pThis->bitmapTex);
+        }
+        else
+        {
+            SDL_UpdateYUVTexture(pThis->bitmapTex, NULL,
+                                 gplane0, gplane0s,
+                                 gplane1, gplane1s,
+                                 gplane2, gplane2s);
+        }
 
         SDL_RenderClear(pThis->renderer);
         SDL_RenderCopy(pThis->renderer, pThis->bitmapTex, NULL, NULL);

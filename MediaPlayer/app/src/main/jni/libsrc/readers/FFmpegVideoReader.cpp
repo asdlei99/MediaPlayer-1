@@ -960,7 +960,9 @@ FFmpegVideoReader::ConvertToRGB(AVFrame * pSrcFrame, uint8_t * prealloc_buffer, 
 #ifdef USE_SWSCALE
         img_convert_ctx = sws_getCachedContext(img_convert_ctx, pCodecCtx->width, pCodecCtx->height, pCodecCtx->pix_fmt,
                                                m_new_width, m_new_height, m_pixelFormat,
-                                               SWS_JAZZROS_CONVERSION_TYPE, NULL, m_dst_sw_filter, NULL);
+                                               SWS_JAZZROS_CONVERSION_TYPE,
+                                               NULL, m_dst_sw_filter,
+                                               NULL);
         if(img_convert_ctx == NULL)
         {
             if (prealloc_buffer == NULL)
