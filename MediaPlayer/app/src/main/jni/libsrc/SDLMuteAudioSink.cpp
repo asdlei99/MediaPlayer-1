@@ -23,6 +23,7 @@
 
 #endif
 
+
 #include "threads/ScopedLock.h"
 typedef OpenThreads::Mutex          Mutex;
 typedef JAZZROS::TScopedLock<Mutex> ScopedLock;

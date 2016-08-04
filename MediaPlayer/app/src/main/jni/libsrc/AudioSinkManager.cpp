@@ -6,6 +6,7 @@
 #include "SDLAudioSink.h"
 
 
+
 JAZZROS::AudioStream * AudioSinkManager::m_lastSetSDLAudioStream = NULL;
 
 AudioSinkManager::AudioSinkManager()

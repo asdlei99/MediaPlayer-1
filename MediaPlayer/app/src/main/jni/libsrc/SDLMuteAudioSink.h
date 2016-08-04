@@ -37,4 +37,5 @@ public:
     virtual bool playing() const { return m_timer_id != 0; }
 };
 
+
 #endif // HEADER_GUARD_SDL_MUTEAUDIOSINK_H

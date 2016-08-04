@@ -10,6 +10,7 @@ namespace JAZZROS {
 class AudioSinkManager
 {
 private:
+
     static JAZZROS::AudioStream * m_lastSetSDLAudioStream;
 
 
