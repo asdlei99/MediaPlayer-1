@@ -382,6 +382,8 @@ case AV_SAMPLE_FMT_DBLP: // to AV_SAMPLE_FMT_DBL
         }
         break;
     }
+default:
+    throw std::runtime_error("FFmpegAudioReader::dePlaneAudio() non supported sample format");
 };
 return 0;
 #endif // JRFFMPEG_ABLE_PLANAR_AUDIO

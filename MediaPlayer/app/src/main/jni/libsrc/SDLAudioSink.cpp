@@ -51,12 +51,14 @@ void SDLAudioSink::play()
 
     _started = true;
     _paused = false;
-
+/*
     LOG("SDLAudioSink()::startPlaying()");
 
     LOG("  audioFrequency()=%d", _audioStream->audioFrequency());
     LOG("  audioNbChannels()=%d", _audioStream->audioNbChannels());
+    LOG("  bytePerSample()=%d", _audioStream->bytePerSample());
     LOG("  audioSampleFormat()=%d", _audioStream->audioSampleFormat());
+*/
 
 
 
@@ -93,18 +95,18 @@ void SDLAudioSink::play()
 
     if (wanted_specs.format!=0)
     {
-        LOG("SDLAudioSink() -> SDL_OpenAudio()...");
-        if (SDL_OpenAudio(&wanted_specs, &specs) < 0)
+//        LOG("SDLAudioSink() -> SDL_OpenAudio()...");
+        if (SDL_OpenAudio(&wanted_specs, &specs) < 0) // todo: actually real params stored in \specs instead of \wanted_specs. And it should be processed
             throw "SDL_OpenAudio() failed (" + std::string(SDL_GetError()) + ")";
 
-        LOG("SDLAudioSink() -> SDL_PauseAudio...");
+//        LOG("SDLAudioSink() -> SDL_PauseAudio...");
         SDL_PauseAudio(0);
     }
     else
     {
         throw "SDL_OpenAudio() does not support audio format";
     }
-    LOG("SDLAudioSink::play() finished successfully");
+//    LOG("SDLAudioSink::play() finished successfully");
 }
 
 void SDLAudioSink::pause()
@@ -123,6 +125,6 @@ void SDLAudioSink::stop()
         if (!_paused) SDL_PauseAudio(1);
         SDL_CloseAudio();
 
-        LOG("~SDLAudioSink() destructor, but still playing");
+//        LOG("~SDLAudioSink() destructor, but still playing");
     }
 }

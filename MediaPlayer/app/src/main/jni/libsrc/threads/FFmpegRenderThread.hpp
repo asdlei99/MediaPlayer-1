@@ -17,6 +17,7 @@ class FFmpegFileHolder;
 class FFmpegRenderThread : protected OpenThreads::Thread
 {
     VideoOutputDevice           * m_pOutputDevice;
+    VideoOutputDeviceData       * m_pOutputDeviceData;
     FFmpegILibAvStreamImpl      * m_pLibAvStream;
     const FFmpegFileHolder      * m_pFileHolder;
     volatile bool               m_renderingThreadStop;
@@ -26,7 +27,7 @@ public:
 
     virtual                     ~FFmpegRenderThread();
 
-    const int                   Initialize(FFmpegILibAvStreamImpl *, VideoOutputDevice *, const FFmpegFileHolder * pFileHolder);
+    const int                   Initialize(FFmpegILibAvStreamImpl *, VideoOutputDevice *, VideoOutputDeviceData *, const FFmpegFileHolder * pFileHolder);
 
     void                        Start();
     void                        Stop();

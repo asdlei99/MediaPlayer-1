@@ -21,7 +21,8 @@ FFmpegAudioStream::FFmpegAudioStream(const FFmpegAudioStream & audio) :
 FFmpegAudioStream::~FFmpegAudioStream()
 {
     // detact the audio sink first to avoid destrction order issues.
-    setAudioSink (NULL);
+    // trystan: caused #3333, crash on close audio.
+    // setAudioSink (NULL);
 }
 
 void FFmpegAudioStream::setAudioSink(AudioSink* audio_sink)
@@ -66,6 +67,11 @@ int FFmpegAudioStream::audioNbChannels() const
     return m_pFileHolder->getAudioFormat().m_channelsNb;
 }
 
+int
+FFmpegAudioStream::bytePerSample() const
+{
+    return m_pFileHolder->getAudioFormat().m_bytePerSample;
+}
 
 AudioStream::SampleFormat
 FFmpegAudioStream::audioSampleFormat() const

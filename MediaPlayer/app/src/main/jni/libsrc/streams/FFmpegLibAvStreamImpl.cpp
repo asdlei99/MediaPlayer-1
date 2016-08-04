@@ -16,7 +16,8 @@ m_audioBalance(0.0f),
 m_AudioBufferTimeSec(6),
 m_ellapsedAudioMicroSec(0),
 m_pPlayer(NULL),
-m_useRibbonTimeStrategy(true)
+m_useRibbonTimeStrategy(true),
+m_audio_sink(NULL)
 {
 }
 
@@ -34,6 +35,17 @@ FFmpegLibAvStreamImpl::setAudioSink(AudioSink * audio_sink)
     // The FFmpegLibAvStreamImpl object takes the responsability of destroying the audio_sink.
     av_log(NULL, AV_LOG_INFO, "FFmpegLibAvStreamImpl::setAudioSink()");
 
+    unsigned long playbackTime;
+    bool isPlaybackPlay = isRunning();
+    if (m_audio_sink.get() && m_audio_sink->playing())
+        isPlaybackPlay = true;
+
+    if (isPlaybackPlay)
+    {
+        playbackTime = GetPlaybackTime();
+        Pause();
+    }
+
     //m_audio_sink = audio_sink;
     m_audio_sink.reset( audio_sink );
     //
@@ -48,6 +60,11 @@ FFmpegLibAvStreamImpl::setAudioSink(AudioSink * audio_sink)
         m_audio_sink->pause();
         //
         m_isAudioSinkImplementsVolumeControl = detectIsItImplementedAudioVolume();
+    }
+    if (isPlaybackPlay)
+    {
+        Seek (playbackTime);
+        Start();
     }
 }
 
@@ -91,7 +108,7 @@ FFmpegLibAvStreamImpl::initialize(const FFmpegFileHolder * pHolder, FFmpegPlayer
         m_frame_rate = pHolder->frameRate();
 
         if (m_video_buffer.alloc(pHolder,
-                                 m_pPlayer->getVOD()->getData()->getMemoeryFrameSize()) < 0)
+                                 m_pPlayer->getVODD()->getMemoeryFrameSize()) < 0)
         {
             m_video_buffer.release();
             m_videoIndex = -1;
@@ -101,6 +118,7 @@ FFmpegLibAvStreamImpl::initialize(const FFmpegFileHolder * pHolder, FFmpegPlayer
         {
             if (m_renderer.Initialize (this,
                                     m_pPlayer->getVOD(),
+                                    m_pPlayer->getVODD(),
                                     pHolder) < 0)
             {
                 m_video_buffer.release();
@@ -331,6 +349,8 @@ FFmpegLibAvStreamImpl::GetAudio(void * buffer, int bytesLength)
                     (*ptr) *= audioVolumeChannel[sampleInd % m_audioFormat.m_channelsNb];
                 break;
             }
+        default:
+            throw std::logic_error ("FFmpegLibAvStreamImpl::GetAudio use unsupported sample format");
         };
     }
     //
@@ -453,7 +473,8 @@ FFmpegLibAvStreamImpl::preRun()
             // todo: should be processed to error
             const int biErr = m_video_buffer.GetFramePtr(0, pFrame, true);
 
-            const short sErr = FFmpegWrapper::getImageFastNonAccurate(m_videoIndex, elapsedTimeMS, pFrame);
+//            const short sErr = FFmpegWrapper::getImageFastNonAccurate(m_videoIndex, elapsedTimeMS, pFrame);
+            const short sErr = FFmpegWrapper::getImage(m_videoIndex, elapsedTimeMS, pFrame);
             m_video_buffer.ReleaseFoundFrame();
 
             if (sErr >= 0)

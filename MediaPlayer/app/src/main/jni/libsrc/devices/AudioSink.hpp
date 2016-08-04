@@ -5,6 +5,8 @@ namespace JAZZROS {
 
     class AudioSink {
     public:
+        virtual ~AudioSink() {};
+
         virtual void play() = 0;
 
         virtual void pause() = 0;

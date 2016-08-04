@@ -138,9 +138,11 @@ extern "C" {
 #endif
 
 const int   gPlayerOpen(const char * mfileName);
-const int   gPlayerPlay();
-const int   gPlayerSeek(const double & percent);
-void        gPlayerQuit();
+const int   gPlayerPlay(const int & index);
+const int   gPlayerPause(const int & index);
+const int   gPlayerSelectCurrent(const int & index);
+const int   gPlayerSeek(const int & index, const double & percent);
+void        gPlayerQuit(const int & index);
 
 int nativePlayerOpen(const char* mfileName)
 {
@@ -173,8 +175,34 @@ int nativePlayerOpen(const char* mfileName)
 #endif
 
 
+Uint32 timerFunctionAnotherThread(Uint32 interval, void *param)
+{
+    SDL_Event event;
+    SDL_UserEvent userevent;
+
+    /* In this example, our callback pushes an SDL_USEREVENT event
+    into the queue, and causes our callback to be called again at the
+    same interval: */
+
+    userevent.type = SDL_USEREVENT;
+    userevent.code = 1;
+    userevent.data1 = NULL;
+    userevent.data2 = NULL;
+
+    event.type = SDL_USEREVENT;
+    event.user = userevent;
+
+    SDL_PushEvent(&event);
+
+    return(interval);
+}
+
 // need for sdl2 static
 int main( int argc, char *argv[] ) {
+
+    int curPlayerIndex = -1;
+    int playerIndex0 = -1;
+    int playerIndex1 = -1;
 
     LOG("Calling method main()");
 
@@ -186,9 +214,20 @@ int main( int argc, char *argv[] ) {
 //        draw_interrupter = SDL_updateYUVTexture;
 
         LOG("nativePlayerOpen(%s)", argv[1]);
-        nativePlayerOpen(argv[1]);
+        playerIndex0 = nativePlayerOpen(argv[1]);
+        curPlayerIndex = playerIndex0;
 
-        gPlayerPlay();
+//        LOG("nativePlayerOpen(%s)", argv[1]);
+        playerIndex1 = gPlayerOpen(argv[2]);
+
+        SDL_TimerID timer_id = SDL_AddTimer(10000,timerFunctionAnotherThread, NULL);
+
+        gPlayerPlay (playerIndex0);
+
+        if (playerIndex1 >= 0) {
+            gPlayerPlay (playerIndex1);
+            curPlayerIndex = playerIndex1;
+        }
     }
     //
     while (running) {
@@ -206,27 +245,42 @@ int main( int argc, char *argv[] ) {
                         }
                         case SDL_SCANCODE_1: {
                             LOG("Pressed button #1");
-                            gPlayerSeek(0.0);
+                            gPlayerSeek(curPlayerIndex, 0.0);
                             break;
                         }
                         case SDL_SCANCODE_2: {
                             LOG("Pressed button #2");
-                            gPlayerSeek(20.0);
+                            gPlayerSeek(curPlayerIndex, 20.0);
                             break;
                         }
                         case SDL_SCANCODE_3: {
                             LOG("Pressed button #3");
-                            gPlayerSeek(70.0);
+                            gPlayerSeek(curPlayerIndex, 70.0);
                             break;
                         }
                         case SDL_SCANCODE_4: {
                             LOG("Pressed button #4");
-                            gPlayerSeek(99.0);
+                            gPlayerSeek(curPlayerIndex, 99.0);
                             break;
                         }
                         case SDL_SCANCODE_5: {
                             LOG("Pressed button #5");
-                            gPlayerSeek(101.0);
+                            gPlayerSeek(curPlayerIndex, 101.0);
+                            break;
+                        }
+                        case SDL_SCANCODE_P: {
+                            LOG("Pause");
+                            gPlayerPause(curPlayerIndex);
+                            break;
+                        }
+                        case SDL_SCANCODE_S: {
+                            LOG("Play");
+                            gPlayerPlay(curPlayerIndex);
+                            break;
+                        }
+                        case SDL_SCANCODE_N: {
+                            curPlayerIndex = curPlayerIndex == 0 ? 1 : 0;
+                            gPlayerSelectCurrent(curPlayerIndex);
                             break;
                         }
                         case  SDL_SCANCODE_Q: {
@@ -239,10 +293,25 @@ int main( int argc, char *argv[] ) {
                 }
                 case SDL_USEREVENT : {
                     /* and now we can call the function we wanted to call in the timer but couldn't because of the multithreading problems */
-
-                    void (*p)(void *) = (void (*)(void *)) event.user.data1;
-                    if (p)
-                        p(event.user.data2);
+                    switch (event.user.code)
+                    {
+                        case 0:
+                        {
+                            void (*p)(void *) = (void (*)(void *)) event.user.data1;
+                            if (p)
+                                p(event.user.data2);
+                            break;
+                        }
+                        case 1:
+                        {
+                            if (playerIndex1 != -1)
+                            {
+                                curPlayerIndex = curPlayerIndex == 0 ? 1 : 0;
+                                gPlayerSelectCurrent(curPlayerIndex);
+                            }
+                            break;
+                        }
+                    };
 
                     break;
                 }
@@ -252,7 +321,9 @@ int main( int argc, char *argv[] ) {
 
     LOG("finished");
 
-    gPlayerQuit();
+    gPlayerQuit(playerIndex0);
+    if (playerIndex1 >= 0)
+        gPlayerQuit(playerIndex1);
 
     SDL_Quit();
 

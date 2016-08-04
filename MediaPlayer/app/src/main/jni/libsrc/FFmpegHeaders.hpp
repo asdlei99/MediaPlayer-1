@@ -6,7 +6,9 @@
 // #define __STDC_CONSTANT_MACROS
 // #define UINTMAX_C  UINT64_C
 #ifdef __cplusplus
- #define __STDC_CONSTANT_MACROS
+ #ifndef __STDC_CONSTANT_MACROS
+   #define __STDC_CONSTANT_MACROS
+ #endif // __STDC_CONSTANT_MACROS
  #ifdef _STDINT_H
   #undef _STDINT_H
  #endif

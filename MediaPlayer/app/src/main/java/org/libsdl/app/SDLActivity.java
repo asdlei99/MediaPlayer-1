@@ -102,9 +102,10 @@ public class SDLActivity extends Activity {
      */
     protected String[] getArguments() {
         //return new String[0];
-        String[] args = new String[1];
+        String[] args = new String[2];
 //        args[0] = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).getAbsolutePath() + "/zula.mp4";
         args[0] = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).getAbsolutePath() + "/Serenity - HD DVD Trailer.mp4";
+        args[1] = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).getAbsolutePath() + "/The Simpsons Movie - Trailer.mp4";
 
         return args;
     }

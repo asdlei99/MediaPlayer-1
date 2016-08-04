@@ -7,12 +7,12 @@ namespace JAZZROS {
     class VideoOutputDeviceDataGL : public VideoOutputDeviceData {
     private:
 
-        virtual const int Initialize(const FFmpegFileHolder & pFileHolder) {
+        virtual const int Initialize(VideoOutputDevice * pVOD, const Size & frameSize) {
 
             /**
              * Initialize parent class' object
              */
-            VideoOutputDeviceData::Initialize(pFileHolder);
+            VideoOutputDeviceData::Initialize(pVOD, frameSize);
 
             /**
              * Initialize local class object
@@ -66,18 +66,16 @@ namespace JAZZROS {
     };
 
     VideoOutputDeviceGL::VideoOutputDeviceGL()
-    : VideoOutputDevice(new VideoOutputDeviceDataGL()),
-      m_pImgStream(NULL){
+    : m_pImgStream(NULL){
+    }
+
+    VideoOutputDeviceData * VideoOutputDeviceGL::CreateData() const
+    {
+        return new VideoOutputDeviceDataGL();
     }
 
     const int
-    VideoOutputDeviceGL::Initialize (VideoOutputDeviceData *pVODD, const FFmpegFileHolder & pFileHolder) {
-
-        if (pVODD == NULL)
-            return -1;
-
-        if (pVODD->Initialize(pFileHolder) != 0)
-            return -2;
+    VideoOutputDeviceGL::Initialize (void) {
 
         // local initialization
 
@@ -89,9 +87,12 @@ namespace JAZZROS {
     }
 
     const int
-    VideoOutputDeviceGL::render(const unsigned char * pFramePtr) const {
+    VideoOutputDeviceGL::render(VideoOutputDeviceData * sender, const unsigned char * pFramePtr) const {
 
         const VideoOutputDeviceDataGL * pData     = dynamic_cast<const VideoOutputDeviceDataGL*>(getData());
+
+        if (sender != pData)
+            return 0;
 
         if (m_pImgStream && pData) {
 

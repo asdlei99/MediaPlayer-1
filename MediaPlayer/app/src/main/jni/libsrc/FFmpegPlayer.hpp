@@ -25,6 +25,7 @@ class MessageQueue;
 class FFmpegParameters;
 
 class VideoOutputDevice;
+class VideoOutputDeviceData;
 
 class FFmpegPlayer: public ImageStream, public OpenThreads::Thread
 {
@@ -59,8 +60,10 @@ public:
 
     virtual bool                isImageTranslucent() const;
 
-    const VideoOutputDevice *   getVOD() const {return m_pVOD;}
-    VideoOutputDevice *         getVOD() {return m_pVOD;}
+    void                        ActivateOutput();
+
+    VideoOutputDevice *         getVOD();
+    VideoOutputDeviceData *     getVODD();
 
 private:
     void                        close();
@@ -106,6 +109,7 @@ private:
     double                      m_seek_time;
 
     VideoOutputDevice *         m_pVOD;
+    VideoOutputDeviceData *     m_vodd;
 };
 
 } // namespace JAZZROS

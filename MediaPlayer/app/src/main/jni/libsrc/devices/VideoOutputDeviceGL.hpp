@@ -12,9 +12,11 @@ namespace JAZZROS {
     ImageStream                 * m_pImgStream;
     private:
 
-        virtual const int       Initialize (VideoOutputDeviceData *, const FFmpegFileHolder & );
+        virtual VideoOutputDeviceData * CreateData() const;
 
-        virtual const int       render(const unsigned char * pFrame) const;
+        virtual const int       Initialize (void);
+
+        virtual const int       render(VideoOutputDeviceData * sender, const unsigned char * pFrame) const;
 
     public:
 

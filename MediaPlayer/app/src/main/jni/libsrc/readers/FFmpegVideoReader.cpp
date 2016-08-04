@@ -32,7 +32,6 @@ FFmpegVideoReader::openFile(const char *filename,
 {
     int                     err, i;
     AVInputFormat *         iformat     = NULL;
-    AVDictionary *          format_opts = NULL;
     AVFormatContext *       fmt_ctx     = NULL;
     //
     //
@@ -51,6 +50,7 @@ FFmpegVideoReader::openFile(const char *filename,
 //    m_pixelFormat                       = AV_PIX_FMT_RGB565LE;
 //    m_pixelFormat                       = AV_PIX_FMT_YUV420P;
     m_pixelFormat                       = outPixFmt;
+    av_init_packet (& m_packet);
 
     if (std::string(filename).compare(0, 5, "/dev/")==0)
     {
@@ -533,7 +533,7 @@ FFmpegVideoReader::GetNextFrame(AVCodecContext *pCodecCtx,
     if (m_FirstFrame)
     {
         m_FirstFrame = false;
-        m_packet.data = NULL;
+        av_init_packet ( & m_packet);
         m_bytesRemaining = 0;
     }
 

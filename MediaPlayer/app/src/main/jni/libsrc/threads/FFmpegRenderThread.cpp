@@ -12,13 +12,14 @@ FFmpegRenderThread::~FFmpegRenderThread()
 }
 
 const int
-FFmpegRenderThread::Initialize(FFmpegILibAvStreamImpl * pSrc, VideoOutputDevice * pDst, const FFmpegFileHolder * pFileHolder)
+FFmpegRenderThread::Initialize(FFmpegILibAvStreamImpl * pSrc, VideoOutputDevice * pDst, VideoOutputDeviceData * pDstData, const FFmpegFileHolder * pFileHolder)
 {
     m_pFileHolder   = pFileHolder;
     m_pLibAvStream  = pSrc;
-    m_pOutputDevice    = pDst;
+    m_pOutputDevice = pDst;
+    m_pOutputDeviceData = pDstData;
 
-    if (pSrc == NULL || pDst == NULL)
+    if (pSrc == NULL || pDst == NULL || pDstData == NULL)
         return -1;
 
     return 0;
@@ -91,7 +92,8 @@ FFmpegRenderThread::run()
                     }
                 }
 
-                m_pOutputDevice->render(pFramePtr);
+                if (m_pOutputDevice->getData() == m_pOutputDeviceData)
+                    m_pOutputDevice->render(m_pOutputDeviceData, pFramePtr);
 
 
                 tick_start_ms = loopTimer.time_m();

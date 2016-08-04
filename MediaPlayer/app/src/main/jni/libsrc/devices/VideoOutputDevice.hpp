@@ -11,18 +11,19 @@ namespace JAZZROS {
 
         VideoOutputDeviceData * m_vodd;
 
-        virtual const int       Initialize (VideoOutputDeviceData *, const FFmpegFileHolder & ) = 0;
-
     public:
 
-                                VideoOutputDevice(VideoOutputDeviceData *);
+                                VideoOutputDevice();
         virtual                 ~VideoOutputDevice();
 
-        const int               Initialize(const FFmpegFileHolder & );
+        void                    SetCurrentData(VideoOutputDeviceData * ptr);
 
-        const VideoOutputDeviceData * getData() const;
+        virtual const int       Initialize (void) = 0;
 
-        virtual const int       render(const unsigned char * pFrame) const = 0;
+        VideoOutputDeviceData * getData() const;
+        virtual VideoOutputDeviceData * CreateData() const = 0;
+
+        virtual const int       render(VideoOutputDeviceData * sender, const unsigned char * pFrame) const = 0;
 
     }; // class VideoOutputDevice
 

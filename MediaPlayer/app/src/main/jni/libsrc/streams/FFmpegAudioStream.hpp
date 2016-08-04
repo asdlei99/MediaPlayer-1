@@ -24,6 +24,7 @@ namespace JAZZROS
 
         virtual int                     audioFrequency() const;
         virtual int                     audioNbChannels() const;
+        virtual int                     bytePerSample() const;
         virtual AudioStream::SampleFormat audioSampleFormat() const;
 
         double                          duration() const;

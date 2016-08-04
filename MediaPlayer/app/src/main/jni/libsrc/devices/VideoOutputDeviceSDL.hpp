@@ -10,22 +10,32 @@ namespace JAZZROS {
 
     class VideoOutputDeviceSDL : public VideoOutputDevice {
 
+    struct sParam {
+        const VideoOutputDeviceSDL * pThis;
+        const VideoOutputDeviceData * pSender;
+        const unsigned char * pFramePtr;
+    };
+    mutable sParam  m_render_param;
+
     friend void my_function(void *pParam);
 
         SDL_Window *window;
-    SDL_Renderer *renderer;
-    SDL_Texture *bitmapTex;
+        SDL_Renderer *renderer;
 
     private:
 
-        virtual const int       Initialize (VideoOutputDeviceData *, const FFmpegFileHolder & );
+        virtual VideoOutputDeviceData * CreateData() const;
 
-        virtual const int       render(const unsigned char * pFrame) const;
+        virtual const int       Initialize (void);
+
+        virtual const int       render(VideoOutputDeviceData * sender, const unsigned char * pFrame) const;
 
     public:
 
         VideoOutputDeviceSDL();
         ~VideoOutputDeviceSDL();
+
+        SDL_Renderer * getRenderer() {return renderer;}
 
     }; // class VideoOutputDeviceSDL
 

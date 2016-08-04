@@ -25,6 +25,8 @@ namespace JAZZROS {
 
         virtual int audioNbChannels() const = 0;
 
+        virtual int bytePerSample() const = 0;
+
         virtual SampleFormat audioSampleFormat() const = 0;
     };
 

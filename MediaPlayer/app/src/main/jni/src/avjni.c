@@ -32,11 +32,12 @@ const int   gAudioReaderGetSamples(unsigned long * msTime,
                                  const double * max_avail_time_micros);
 
 const int   gPlayerOpen(const char * mfileName);
-const int   gPlayerPlay();
-const int   gPlayerPause();
-const int   gPlayerSeek(const double & percent);
-void        gPlayerQuit();
-const int   gGetPlayerStatus(); // 0: paused, 1: run
+const int   gPlayerPlay(const int & index);
+const int   gPlayerPause(const int & index);
+const int   gPlayerSelectCurrent(const int & index);
+const int   gPlayerSeek(const int & index, const double & percent);
+void        gPlayerQuit(const int & index);
+const int   gGetPlayerStatus(const int & index); // 0: paused, 1: run
 //
 // ros:
 //
@@ -734,18 +735,18 @@ JNIEXPORT jint JNICALL Java_com_jazzros_ffmpegtest_FFMpegView_nativePlayerOpen(J
 
 JNIEXPORT jint JNICALL Java_com_jazzros_ffmpegtest_FFMpegView_nativePlayerPlay(JNIEnv* env, jobject thiz)
 {
-    return gPlayerPlay();
+    return gPlayerPlay(0);
 }
 
 JNIEXPORT jint JNICALL Java_com_jazzros_ffmpegtest_FFMpegView_nativePlayerPause(JNIEnv* env, jobject thiz)
 {
-    return gPlayerPause();
+    return gPlayerPause(0);
 }
 JNIEXPORT jint JNICALL Java_com_jazzros_ffmpegtest_FFMpegView_nativePlayerSeek(JNIEnv* env, jobject thiz, jdouble percent)
 {
-    return gPlayerSeek (percent);
+    return gPlayerSeek (0, percent);
 }
 JNIEXPORT jint JNICALL Java_com_jazzros_ffmpegtest_FFMpegView_nativePlayerGetStatus(JNIEnv* env, jobject thiz)
 {
-    return gGetPlayerStatus();
+    return gGetPlayerStatus(0);
 }

@@ -2,29 +2,30 @@
 #define HEADER_GUARD_VIDEOOUTPUTDEVICEDATA_H
 
 #include "../FFmpegHeaders.hpp"
-#include "../FFmpegFileHolder.hpp"
+#include "../FFmpegFileHolder.hpp" // todo: only for type \Size
 
 namespace JAZZROS {
+
+    class VideoOutputDevice;
 
     class VideoOutputDeviceData {
 
     private:
 
         Size                    m_frameSize;
-        AVPixelFormat           m_pixFmt;
+        const AVPixelFormat     m_pixFmt;
 
     public:
 
-        virtual const int Initialize(const FFmpegFileHolder & pFileHolder) {
-            m_pixFmt = pFileHolder.getPixFormat2();
-            m_frameSize = pFileHolder.getFrameSize();
+        virtual const int Initialize(VideoOutputDevice * pVOD, const Size & frameSize) {
+            m_frameSize = frameSize;
             return 0;
         }
 
     public:
 
         VideoOutputDeviceData(const AVPixelFormat & pixFmt):m_pixFmt(pixFmt){}
-
+        virtual ~VideoOutputDeviceData(){};
 
         unsigned int    getMemoeryFrameSize (void) const {
             return avpicture_get_size (m_pixFmt, m_frameSize.Width, m_frameSize.Height);

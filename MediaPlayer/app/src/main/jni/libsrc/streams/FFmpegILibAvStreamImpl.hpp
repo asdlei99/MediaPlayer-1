@@ -7,6 +7,7 @@ namespace JAZZROS {
 class AudioSink;
 class FFmpegPlayer;
 class FFmpegFileHolder;
+class VideoOutputDevice;
 
 class FFmpegILibAvStreamImpl
 {

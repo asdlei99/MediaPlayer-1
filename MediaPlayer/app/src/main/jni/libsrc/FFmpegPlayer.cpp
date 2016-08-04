@@ -5,6 +5,8 @@
 #include "devices/VideoOutputDevice.hpp"
 #include "devices/VideoOutputDeviceData.hpp"
 
+#include "AudioSinkManager.h"
+
 #include "threads/ScopedLock.h"
 
 #include <memory>
@@ -14,7 +16,9 @@ size_t getMemorySize();
 namespace JAZZROS {
 
 FFmpegPlayer::FFmpegPlayer() :
-    m_commands(0),m_pVOD(NULL)
+    m_commands(0)
+    ,m_pVOD(NULL)
+    ,m_vodd(NULL)
 {
 //ros:    setOrigin(osg::Image::TOP_LEFT);
 
@@ -27,6 +31,9 @@ FFmpegPlayer::FFmpegPlayer() :
 
 FFmpegPlayer::FFmpegPlayer(const FFmpegPlayer & image) :
     ImageStream(image)
+    ,m_commands(0)
+    ,m_pVOD(NULL)
+    ,m_vodd(NULL)
 {
     // todo: probably incorrect or incomplete. Maybe it will be better to hide copy constructor?
 }
@@ -47,6 +54,9 @@ FFmpegPlayer::~FFmpegPlayer()
 
     delete m_commands;
 
+    if (m_vodd)
+        delete m_vodd;
+
     av_log(NULL, AV_LOG_INFO, "Destructed FFmpegPlayer");
 }
 
@@ -59,17 +69,25 @@ bool FFmpegPlayer::open(const std::string & filename, FFmpegParameters* paramete
 
     m_pVOD = pVOD;
 
-    if (m_fileHolder.open(filename, parameters, m_pVOD->getData()->getFFPixelFormat()) < 0)
+    m_vodd = m_pVOD->CreateData();
+
+    if (m_fileHolder.open(filename, parameters, m_vodd->getFFPixelFormat()) < 0)
         return false;
 
     /**
      * We need initialize video output device before open streamer and after holder has been opened
      */
     if (m_fileHolder.videoIndex() >= 0) {
-        if (m_pVOD->Initialize(m_fileHolder) != 0) {
-            av_log(NULL, AV_LOG_ERROR, "ERROR: Cannot initialize video output device");
-            m_fileHolder.close();
-            return false;
+        if (m_pVOD->Initialize() == 0) {
+
+            if (m_vodd->Initialize(m_pVOD, m_fileHolder.getFrameSize()) != 0) {
+
+                av_log(NULL, AV_LOG_ERROR, "ERROR: Cannot initialize video output device");
+                m_fileHolder.close();
+                return false;
+            }
+
+            pVOD->SetCurrentData (m_vodd);
         }
     }
 
@@ -81,7 +99,7 @@ bool FFmpegPlayer::open(const std::string & filename, FFmpegParameters* paramete
     // If video exist...
     if (m_fileHolder.videoIndex() >= 0)
     {
-        m_pVOD->render(m_streamer.getFrame());
+        m_pVOD->render(m_vodd, m_streamer.getFrame());
 
         setPixelAspectRatio(m_fileHolder.pixelAspectRatio());
 
@@ -112,8 +130,14 @@ bool FFmpegPlayer::open(const std::string & filename, FFmpegParameters* paramete
 
 void FFmpegPlayer::close()
 {
+    m_streamer.setAudioSink(NULL);
     m_streamer.close();
     m_fileHolder.close();
+    if (m_vodd)
+    {
+        delete m_vodd;
+        m_vodd = NULL;
+    }
 }
 
 void FFmpegPlayer::play()
@@ -227,7 +251,13 @@ bool FFmpegPlayer::isImageTranslucent() const
     return m_fileHolder.alphaChannel();
 }
 
+VideoOutputDevice * FFmpegPlayer::getVOD() {
+    return m_pVOD;
+}
 
+VideoOutputDeviceData * FFmpegPlayer::getVODD() {
+    return m_vodd;
+}
 
 void FFmpegPlayer::run()
 {
@@ -389,8 +419,8 @@ void FFmpegPlayer::setImage(const unsigned short &width, const unsigned short &h
 
 const size_t FFmpegPlayer::s() const
 {
-    if (m_pVOD) {
-        const Size frameSize = m_pVOD->getData()->getFrameSize();
+    if (m_vodd) {
+        const Size frameSize = m_vodd->getFrameSize();
         return frameSize.Width;
     }
     return 100;
@@ -398,11 +428,24 @@ const size_t FFmpegPlayer::s() const
 
 const size_t FFmpegPlayer::t() const
 {
-    if (m_pVOD) {
-        const Size frameSize = m_pVOD->getData()->getFrameSize();
+    if (m_vodd) {
+        const Size frameSize = m_vodd->getFrameSize();
         return frameSize.Height;
     }
     return 100;
+}
+
+void FFmpegPlayer::ActivateOutput()
+{
+    JAZZROS::AudioStream *   audioStream = NULL;
+
+    if (getAudioStreams().empty() == false)
+        audioStream = getAudioStreams().front();
+
+    AudioSinkManager::setSDLAudioSink (audioStream);
+
+    if (m_pVOD && m_vodd)
+        m_pVOD->SetCurrentData(m_vodd);
 }
 
 } // namespace JAZZROS

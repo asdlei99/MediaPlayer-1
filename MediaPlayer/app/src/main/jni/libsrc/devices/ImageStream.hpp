@@ -27,12 +27,12 @@ namespace JAZZROS {
 
 
     protected:
-        PlayingStatus _status;
         enum LoopingMode {
             SINGLE,
             LOOPING
         };
         LoopingMode m_loopMode;
+        PlayingStatus _status;
     public:
         ImageStream() : m_loopMode(SINGLE), _status(PAUSED) {
         }

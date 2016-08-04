@@ -10,11 +10,13 @@ JAZZROS::FFmpegAudioReader*  gAudioReader;
 #include "devices/VideoOutputDeviceGL.hpp"
 
 
-#include "SDLAudioSink.h"
 
-JAZZROS::FFmpegPlayer           gPlayer;
+//JAZZROS::FFmpegPlayer           gPlayer;
+JAZZROS::FFmpegPlayer           gPlayerArray[2];
 JAZZROS::VideoOutputDeviceSDL   gOutputDevice;
 // JAZZROS::VideoOutputDeviceGL   gOutputDevice;
+std::size_t                     gPlayerArrayNb = 0;
+
 
 extern "C"
 {
@@ -123,49 +125,55 @@ const int   gPlayerOpen(const char * pFileName)
 ///    av_dict_set(parameters->getOptions(), "video_size", "1280:720", 0);
 //    av_dict_set(parameters->getOptions(), "video_size", "2048:2048", 0);
     //
+    JAZZROS::FFmpegPlayer & gPlayer = gPlayerArray[gPlayerArrayNb];
+
     if (gPlayer.open(pFileName, parameters, & gOutputDevice) == true) {
 
         /**
          * After player's method open() has been through successfully, it's object contains
          * audio streams list. Audio stream should be initialized of real device for output.
          */
-        std::vector<JAZZROS::AudioStream *> & audioStreamList = gPlayer.getAudioStreams();
+        gPlayer.ActivateOutput();
 
-        if (audioStreamList.size() > 0) {
+        gPlayerArrayNb++;
 
-            JAZZROS::AudioStream *   audioStream = audioStreamList.front();
-            audioStream->setAudioSink (new SDLAudioSink(audioStream));
-        }
-
-        return 0;
+        return gPlayerArrayNb - 1;
     }
     return -1;
 }
 
-const int   gPlayerPlay()
+const int   gPlayerPlay(const int & index)
 {
-    gPlayer.play();
+    gPlayerArray[index].play();
     return 0;
 }
-const int   gPlayerPause()
+const int   gPlayerPause(const int & index)
 {
-    gPlayer.pause();
+    gPlayerArray[index].pause();
     return 0;
 }
-const int   gPlayerSeek(const double & percent)
+const int   gPlayerSelectCurrent(const int & index)
 {
-    const double length = gPlayer.getLength();
-    gPlayer.seek(length * percent / 100.0);
+    JAZZROS::FFmpegPlayer & player = gPlayerArray[index];
+
+    player.ActivateOutput();
 
     return 0;
 }
-void        gPlayerQuit()
+const int   gPlayerSeek(const int & index, const double & percent)
 {
-    gPlayer.quit();
+    const double length = gPlayerArray[index].getLength();
+    gPlayerArray[index].seek(length * percent / 100.0);
+
+    return 0;
 }
-const int   gGetPlayerStatus()
+void        gPlayerQuit(const int & index)
 {
-    switch (gPlayer.get_status()) {
+    gPlayerArray[index].quit();
+}
+const int   gGetPlayerStatus(const int & index)
+{
+    switch (gPlayerArray[index].get_status()) {
         case JAZZROS::ImageStream::PAUSED:
             return 0;
         case JAZZROS::ImageStream::PLAYING:
