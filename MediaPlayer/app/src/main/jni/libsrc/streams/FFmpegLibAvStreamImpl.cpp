@@ -63,7 +63,7 @@ FFmpegLibAvStreamImpl::setAudioSink(AudioSink * audio_sink)
     }
     if (isPlaybackPlay)
     {
-        Seek (playbackTime);
+///        Seek (playbackTime);
         Start();
     }
 }

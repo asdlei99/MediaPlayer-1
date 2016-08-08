@@ -36,6 +36,7 @@ LOCAL_SRC_FILES += ../libsrc/devices/VideoOutputDeviceGL.cpp
 LOCAL_SRC_FILES += ../libsrc/devices/VideoOutputDeviceSDL.cpp
 LOCAL_SRC_FILES += ../libsrc/AudioSinkManager.cpp
 LOCAL_SRC_FILES += ../libsrc/SDLMuteAudioSink.cpp
+LOCAL_SRC_FILES += ../libsrc/SDLProxiAudioSink.cpp
 # LOCAL_SRC_FILES += avjni.c
 LOCAL_SRC_FILES += game.c
 

@@ -23,14 +23,17 @@
 
 #endif
 
-
 #include "threads/ScopedLock.h"
 typedef OpenThreads::Mutex          Mutex;
 typedef JAZZROS::TScopedLock<Mutex> ScopedLock;
 Mutex                               g_lockSDLMuteAudioSinkMutex;
 
+#ifdef ANDROID
+    #define MUTE_BUF_SIZE   (2 * 22050 * 1 / 10)
+#else
+    #define MUTE_BUF_SIZE   (2 * 44100 * 2 / 10)
+#endif // ANDROID
 
-#define MUTE_BUF_SIZE   (2 * 44100 * 2 / 10)
 unsigned char MUTE_BUFFER[MUTE_BUF_SIZE * 2]; // multimply by 2 for memory enough guaranties
 
 static Uint32 soundReadCallback(Uint32 interval, void *param)

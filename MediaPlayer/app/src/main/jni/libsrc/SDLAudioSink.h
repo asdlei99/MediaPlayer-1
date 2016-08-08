@@ -19,13 +19,12 @@ class SDLAudioSink : public JAZZROS::AudioSink
     virtual void setVolume(float) {}
     virtual float getVolume() const {return 0.5f;};
 
-    // Only class AudioSinkManager may construct this object
+public:
     SDLAudioSink(JAZZROS::AudioStream* audioStream):
             _started(false),
             _paused(false),
             _audioStream(audioStream) {
     }
-public:
 
     ~SDLAudioSink();
 

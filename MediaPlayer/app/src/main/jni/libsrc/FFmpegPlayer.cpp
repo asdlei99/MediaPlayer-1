@@ -180,6 +180,20 @@ void FFmpegPlayer::seek(double time)
         pushCommand(CMD_PLAY);
 }
 
+// todo: it is strange, but here we need to init SDL in main thread, not in command-stack om shadow thread.
+void FFmpegPlayer::activateOutput()
+{
+    const PlayingStatus prevStatus = get_status();
+
+    if (prevStatus == PLAYING)
+        cmdPause();
+
+    //pushCommand(CMD_ACTOUTPUT);
+    cmdActivateOutput();
+
+    if (prevStatus == PLAYING)
+        cmdPlay();
+}
 
 
 void FFmpegPlayer::quit(bool waitForThreadToExit)
@@ -351,6 +365,10 @@ bool FFmpegPlayer::handleCommand(const Command cmd)
         cmdPause();
         return false;
 
+    case CMD_ACTOUTPUT:
+        cmdActivateOutput();
+        return true;
+
     default:
         //OSG_WARN << "FFmpegPlayer::handleCommand() Unsupported command" << std::endl;
         av_log(NULL, AV_LOG_WARNING, "FFmpegPlayer::handleCommand() Unsupported command");
@@ -435,17 +453,28 @@ const size_t FFmpegPlayer::t() const
     return 100;
 }
 
-void FFmpegPlayer::ActivateOutput()
+void FFmpegPlayer::cmdActivateOutput()
 {
-    JAZZROS::AudioStream *   audioStream = NULL;
-
-    if (getAudioStreams().empty() == false)
-        audioStream = getAudioStreams().front();
-
-    AudioSinkManager::setSDLAudioSink (audioStream);
+    AudioSinkManager::setSDLAudioSink (this);
 
     if (m_pVOD && m_vodd)
         m_pVOD->SetCurrentData(m_vodd);
+}
+
+void FFmpegPlayer::setAudioSink(FFmpegPlayer * player, JAZZROS::AudioStream *   audioStream, JAZZROS::AudioSink * sink)
+{
+    if (player && audioStream && sink)
+    {
+        const JAZZROS::ImageStream::PlayingStatus prevStatus = player->get_status();
+
+        if (prevStatus == JAZZROS::ImageStream::PLAYING)
+            player->cmdPause();
+
+        audioStream->setAudioSink ( sink );
+
+        if (prevStatus == JAZZROS::ImageStream::PLAYING)
+            player->cmdPlay();
+    }
 }
 
 } // namespace JAZZROS

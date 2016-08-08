@@ -220,7 +220,7 @@ int main( int argc, char *argv[] ) {
 //        LOG("nativePlayerOpen(%s)", argv[1]);
         playerIndex1 = gPlayerOpen(argv[2]);
 
-        SDL_TimerID timer_id = SDL_AddTimer(10000,timerFunctionAnotherThread, NULL);
+        SDL_TimerID timer_id = SDL_AddTimer(3000,timerFunctionAnotherThread, NULL);
 
         gPlayerPlay (playerIndex0);
 

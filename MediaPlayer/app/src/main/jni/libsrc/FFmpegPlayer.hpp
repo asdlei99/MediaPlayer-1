@@ -44,6 +44,7 @@ public:
     virtual void                rewind();
     virtual void                seek(double time);
     virtual void                quit(bool waitForThreadToExit = true);
+    void                        activateOutput();
 
     virtual void                setVolume(float volume);
     virtual float               getVolume() const;
@@ -60,10 +61,10 @@ public:
 
     virtual bool                isImageTranslucent() const;
 
-    void                        ActivateOutput();
-
     VideoOutputDevice *         getVOD();
     VideoOutputDeviceData *     getVODD();
+
+    static void                 setAudioSink(FFmpegPlayer * player, JAZZROS::AudioStream *   audioStream, JAZZROS::AudioSink * sink);
 
 private:
     void                        close();
@@ -74,7 +75,8 @@ private:
         CMD_PAUSE,
         CMD_STOP,
         CMD_REWIND,
-        CMD_SEEK
+        CMD_SEEK,
+        CMD_ACTOUTPUT
     };
 
     typedef MessageQueue<Command>   CommandQueue;
@@ -92,6 +94,7 @@ private:
     void                        cmdPause();
     void                        cmdRewind();
     void                        cmdSeek(double time);
+    void                        cmdActivateOutput();
 
     virtual void setImage(const unsigned short &width, const unsigned short &height,
                           const int &someInt,

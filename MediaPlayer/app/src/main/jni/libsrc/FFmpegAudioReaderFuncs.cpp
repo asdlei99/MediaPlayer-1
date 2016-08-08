@@ -133,7 +133,7 @@ const int   gPlayerOpen(const char * pFileName)
          * After player's method open() has been through successfully, it's object contains
          * audio streams list. Audio stream should be initialized of real device for output.
          */
-        gPlayer.ActivateOutput();
+        gPlayer.activateOutput();
 
         gPlayerArrayNb++;
 
@@ -156,7 +156,7 @@ const int   gPlayerSelectCurrent(const int & index)
 {
     JAZZROS::FFmpegPlayer & player = gPlayerArray[index];
 
-    player.ActivateOutput();
+    player.activateOutput();
 
     return 0;
 }

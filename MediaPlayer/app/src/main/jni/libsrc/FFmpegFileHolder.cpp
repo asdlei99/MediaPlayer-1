@@ -96,10 +96,19 @@ FFmpegFileHolder::open (const std::string & filename, FFmpegParameters* paramete
             // Moreover, base test-app (Example osgmovie) use "AUDIO_S16SYS" hardcoded, so
             // let it be follow:
             //
+            // todo: interesting. Here we could set any permanent params to be permanent in output sink.
+            // it could be usefull for SDL init device and decrease delay in initialization
             m_audioFormat.m_bytePerSample   = 2;
             m_audioFormat.m_avSampleFormat  = AV_SAMPLE_FMT_S16;
-//m_audioFormat.m_channelsNb      = 2; // todo: interesting. Here we could set any permanent params to be permanent in output sink.
-//m_audioFormat.m_sampleRate      = 44100; // it could be usefull for SDL init device and decrease delay in initialization
+            m_audioFormat.m_channelsNb      = 2;
+            m_audioFormat.m_sampleRate      = 44100;
+#ifdef ANDROID
+            m_audioFormat.m_channelsNb      = 1;
+            m_audioFormat.m_sampleRate      = 22050;
+#else
+            m_audioFormat.m_channelsNb      = 2;
+            m_audioFormat.m_sampleRate      = 44100;
+#endif // ANDROID
         }
         //
         // Open For Video

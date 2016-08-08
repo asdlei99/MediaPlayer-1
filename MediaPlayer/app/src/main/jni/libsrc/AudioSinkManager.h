@@ -5,25 +5,25 @@
 namespace JAZZROS {
     class AudioSink;
     class AudioStream;
+    class FFmpegPlayer;
 }; // namespace JAZZROS
 
 class AudioSinkManager
 {
 private:
-
-    static JAZZROS::AudioStream * m_lastSetSDLAudioStream;
+    static JAZZROS::FFmpegPlayer * m_lastSetSDLAudioPlayer;
 
 
     static JAZZROS::AudioSink * BuildSDLMuteAudioSink(JAZZROS::AudioStream* audioStream);
 
-    static JAZZROS::AudioSink * BuildSDLAudioSink(JAZZROS::AudioStream* audioStream);
+    static JAZZROS::AudioSink * BuildSDLProxiAudioSink(JAZZROS::AudioStream* audioStream);
 
     AudioSinkManager();
 public:
     ~AudioSinkManager();
 
 
-    static void  setSDLAudioSink(JAZZROS::AudioStream* audioStream);
+    static void  setSDLAudioSink(JAZZROS::FFmpegPlayer* player);
 };
 
 

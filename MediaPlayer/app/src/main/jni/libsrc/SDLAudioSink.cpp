@@ -2,6 +2,7 @@
 #include "devices/AudioStream.hpp"
 #include <string>
 #include <stdio.h>
+#include <stdexcept>
 
 #define  LOG_TAG    "SDL"
 
@@ -28,8 +29,11 @@ static void soundReadCallback(void * user_data, uint8_t * data, int datalen)
 {
     SDLAudioSink * sink = reinterpret_cast<SDLAudioSink*>(user_data);
 
-    if (sink->_audioStream)
-        sink->_audioStream->consumeAudioBuffer(data, datalen);
+    if (sink)
+    {
+        if (sink->_audioStream)
+            sink->_audioStream->consumeAudioBuffer(data, datalen);
+    }
 }
 
 SDLAudioSink::~SDLAudioSink()
@@ -95,9 +99,13 @@ void SDLAudioSink::play()
 
     if (wanted_specs.format!=0)
     {
+        SDL_ClearError();
 //        LOG("SDLAudioSink() -> SDL_OpenAudio()...");
         if (SDL_OpenAudio(&wanted_specs, &specs) < 0) // todo: actually real params stored in \specs instead of \wanted_specs. And it should be processed
-            throw "SDL_OpenAudio() failed (" + std::string(SDL_GetError()) + ")";
+        {
+//            printf (std::string("SDL_OpenAudio() failed (" + std::string(SDL_GetError()) + ")").c_str());
+            throw std::logic_error("SDL_OpenAudio() failed (" + std::string(SDL_GetError()) + ")");
+        }
 
 //        LOG("SDLAudioSink() -> SDL_PauseAudio...");
         SDL_PauseAudio(0);

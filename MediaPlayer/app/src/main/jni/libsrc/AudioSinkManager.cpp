@@ -3,11 +3,13 @@
 #include "devices/AudioStream.hpp"
 
 #include "SDLMuteAudioSink.h"
+#include "SDLProxiAudioSink.h"
 #include "SDLAudioSink.h"
+#include "FFmpegPlayer.hpp"
 
 
-
-JAZZROS::AudioStream * AudioSinkManager::m_lastSetSDLAudioStream = NULL;
+JAZZROS::FFmpegPlayer * AudioSinkManager::m_lastSetSDLAudioPlayer = NULL;
+SDLAudioSink        m_sdl_audiosink(NULL);
 
 AudioSinkManager::AudioSinkManager()
 {
@@ -24,24 +26,40 @@ AudioSinkManager::BuildSDLMuteAudioSink(JAZZROS::AudioStream* audioStream)
 }
 
 JAZZROS::AudioSink *
-AudioSinkManager::BuildSDLAudioSink(JAZZROS::AudioStream* audioStream)
+AudioSinkManager::BuildSDLProxiAudioSink(JAZZROS::AudioStream* audioStream)
 {
-    return new SDLAudioSink(audioStream);
+    return new SDLProxiAudioSink(audioStream, & m_sdl_audiosink);
 }
 
 void
-AudioSinkManager::setSDLAudioSink(JAZZROS::AudioStream* audioStream)
+AudioSinkManager::setSDLAudioSink(JAZZROS::FFmpegPlayer* player)
 {
     // Prevent reassigning the same sink
-    if (m_lastSetSDLAudioStream == audioStream)
+    if (m_lastSetSDLAudioPlayer == player)
         return;
 
+    JAZZROS::AudioStream *   lastAudioStream = NULL;
+    JAZZROS::AudioStream *   newAudioStream = NULL;
+
+    if (player->getAudioStreams().empty() == false)
+        newAudioStream = player->getAudioStreams().front();
+
     // Turn off the last SDL audio sink
-    if (m_lastSetSDLAudioStream != NULL)
-        m_lastSetSDLAudioStream->setAudioSink ( AudioSinkManager::BuildSDLMuteAudioSink(m_lastSetSDLAudioStream) );
+    if (m_lastSetSDLAudioPlayer != NULL)
+    {
+        if (m_lastSetSDLAudioPlayer->getAudioStreams().empty() == false)
+            lastAudioStream = m_lastSetSDLAudioPlayer->getAudioStreams().front();
 
-    m_lastSetSDLAudioStream = audioStream;
+        if (lastAudioStream)
+            JAZZROS::FFmpegPlayer::setAudioSink (m_lastSetSDLAudioPlayer,
+                                                 lastAudioStream,
+                                                 AudioSinkManager::BuildSDLMuteAudioSink (lastAudioStream) );
+    }
 
-    if (audioStream)
-        audioStream->setAudioSink ( AudioSinkManager::BuildSDLAudioSink(audioStream) );
+
+    m_lastSetSDLAudioPlayer = player;
+
+    if (newAudioStream)
+        newAudioStream->setAudioSink ( AudioSinkManager::BuildSDLProxiAudioSink(newAudioStream) );
+
 }
