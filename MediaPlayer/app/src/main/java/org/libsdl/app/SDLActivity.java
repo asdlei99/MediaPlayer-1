@@ -60,6 +60,8 @@ public class SDLActivity extends Activity {
     // Audio
     protected static AudioTrack mAudioTrack;
 
+    private ArrayList<String> g_filepath_list = null;
+
     /**
      * This method is called by SDL before loading the native shared libraries.
      * It can be overridden to provide names of shared libraries to be loaded.
@@ -101,11 +103,14 @@ public class SDLActivity extends Activity {
      * @return arguments for the native application.
      */
     protected String[] getArguments() {
+        /*
         //return new String[0];
         String[] args = new String[2];
 //        args[0] = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).getAbsolutePath() + "/zula.mp4";
         args[0] = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).getAbsolutePath() + "/Serenity - HD DVD Trailer.mp4";
         args[1] = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).getAbsolutePath() + "/The Simpsons Movie - Trailer.mp4";
+*/
+        String[] args = g_filepath_list.toArray(new String[g_filepath_list.size()]);
 
         return args;
     }
@@ -193,12 +198,17 @@ public class SDLActivity extends Activity {
         // Get filename from "Open with" of another application
         Intent intent = getIntent();
 
+        /* ros:
         if (intent != null && intent.getData() != null) {
             String filename = intent.getData().getPath();
             if (filename != null) {
                 Log.v(TAG, "Got filename: " + filename);
                 SDLActivity.onNativeDropFile(filename);
             }
+        }
+        */
+        if (intent != null) {
+            g_filepath_list = intent.getExtras().getStringArrayList("parStringArray");
         }
     }
 

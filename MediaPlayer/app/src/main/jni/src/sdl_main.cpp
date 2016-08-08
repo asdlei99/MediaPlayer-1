@@ -213,12 +213,11 @@ int main( int argc, char *argv[] ) {
     if (argc > 1) {
 //        draw_interrupter = SDL_updateYUVTexture;
 
-        LOG("nativePlayerOpen(%s)", argv[1]);
         playerIndex0 = nativePlayerOpen(argv[1]);
         curPlayerIndex = playerIndex0;
 
-//        LOG("nativePlayerOpen(%s)", argv[1]);
-        playerIndex1 = gPlayerOpen(argv[2]);
+        if (argc > 2)
+            playerIndex1 = gPlayerOpen(argv[2]);
 
         SDL_TimerID timer_id = SDL_AddTimer(3000,timerFunctionAnotherThread, NULL);
 
