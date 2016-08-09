@@ -8,13 +8,12 @@ JAZZROS::FFmpegAudioReader*  gAudioReader;
 #include "FFmpegPlayer.hpp"
 #include "devices/VideoOutputDeviceSDL.hpp"
 #include "devices/VideoOutputDeviceGL.hpp"
-
+#include "AudioSinkManager.h"
 
 
 //JAZZROS::FFmpegPlayer           gPlayer;
 JAZZROS::FFmpegPlayer           gPlayerArray[2];
-JAZZROS::VideoOutputDeviceSDL   gOutputDevice;
-// JAZZROS::VideoOutputDeviceGL   gOutputDevice;
+JAZZROS::VideoOutputDevice *    gOutputDevicePtr = NULL;
 std::size_t                     gPlayerArrayNb = 0;
 
 
@@ -117,8 +116,37 @@ const int gAudioReaderGetSamples(unsigned long * msTime,
     return -1;
 }
 
+const int   gPlayerInit()
+{
+    if (gOutputDevicePtr == NULL) {
+        gOutputDevicePtr = new JAZZROS::VideoOutputDeviceSDL();
+//        gOutputDevicePtr = new JAZZROS::VideoOutputDeviceGL();
+    }
+    if (AudioSinkManager::initialize() != 0)
+        return -1;
+
+    gPlayerArrayNb = 0;
+
+    return 0;
+}
+const int   gPlayerRelease()
+{
+    if (gOutputDevicePtr) {
+        delete gOutputDevicePtr;
+        gOutputDevicePtr = NULL;
+    }
+    if (AudioSinkManager::release() != 0)
+        return -1;
+
+    return 0;
+}
+
 const int   gPlayerOpen(const char * pFileName)
 {
+    if (gOutputDevicePtr == NULL)
+    {
+        return -1;
+    }
 
 
     JAZZROS::FFmpegParameters * parameters = new JAZZROS::FFmpegParameters();
@@ -127,7 +155,7 @@ const int   gPlayerOpen(const char * pFileName)
     //
     JAZZROS::FFmpegPlayer & gPlayer = gPlayerArray[gPlayerArrayNb];
 
-    if (gPlayer.open(pFileName, parameters, & gOutputDevice) == true) {
+    if (gPlayer.open(pFileName, parameters, gOutputDevicePtr) == true) {
 
         /**
          * After player's method open() has been through successfully, it's object contains

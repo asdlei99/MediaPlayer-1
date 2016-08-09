@@ -22,6 +22,8 @@ private:
 public:
     ~AudioSinkManager();
 
+    static const int initialize();
+    static const int release();
 
     static void  setSDLAudioSink(JAZZROS::FFmpegPlayer* player);
 };

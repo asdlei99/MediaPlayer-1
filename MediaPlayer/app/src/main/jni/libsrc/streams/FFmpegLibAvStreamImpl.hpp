@@ -72,7 +72,7 @@ public:
 
     virtual void                    Start();
     virtual void                    Pause();
-    virtual void                    Stop();
+    virtual void                    Close();
     virtual void                    Seek(const unsigned long & newTimeMS);
 
     virtual const bool              isHasAudio() const;

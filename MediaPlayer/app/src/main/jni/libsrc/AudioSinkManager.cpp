@@ -9,7 +9,7 @@
 
 
 JAZZROS::FFmpegPlayer * AudioSinkManager::m_lastSetSDLAudioPlayer = NULL;
-SDLAudioSink        m_sdl_audiosink(NULL);
+SDLAudioSink        * m_sdl_audiosink_ptr = NULL;
 
 AudioSinkManager::AudioSinkManager()
 {
@@ -18,6 +18,27 @@ AudioSinkManager::AudioSinkManager()
 AudioSinkManager::~AudioSinkManager()
 {
 }
+
+const int
+AudioSinkManager::initialize()
+{
+    if (m_sdl_audiosink_ptr == NULL)
+        m_sdl_audiosink_ptr = new SDLAudioSink (NULL);
+
+    return 0;
+}
+
+const int
+AudioSinkManager::release()
+{
+    if (m_sdl_audiosink_ptr != NULL)
+    {
+        delete m_sdl_audiosink_ptr;
+        m_sdl_audiosink_ptr = NULL;
+    }
+    return 0;
+}
+
 
 JAZZROS::AudioSink *
 AudioSinkManager::BuildSDLMuteAudioSink(JAZZROS::AudioStream* audioStream)
@@ -28,7 +49,10 @@ AudioSinkManager::BuildSDLMuteAudioSink(JAZZROS::AudioStream* audioStream)
 JAZZROS::AudioSink *
 AudioSinkManager::BuildSDLProxiAudioSink(JAZZROS::AudioStream* audioStream)
 {
-    return new SDLProxiAudioSink(audioStream, & m_sdl_audiosink);
+    if (m_sdl_audiosink_ptr == NULL)
+        return NULL;
+
+    return new SDLProxiAudioSink (audioStream, m_sdl_audiosink_ptr);
 }
 
 void

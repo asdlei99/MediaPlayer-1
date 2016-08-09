@@ -49,6 +49,7 @@
 #endif
 
 #include <string>
+#include "../libsrc/devices/VideoOutputDeviceSDL.hpp" // todo: only for SDL_USEREVENT_CODE_TIMER1
 #include "../libsrc/FFmpegPlayer.hpp"
 
 #ifdef __cplusplus
@@ -137,6 +138,8 @@ void my_function(void *param) {
 extern "C" {
 #endif
 
+const int   gPlayerInit();
+const int   gPlayerRelease();
 const int   gPlayerOpen(const char * mfileName);
 const int   gPlayerPlay(const int & index);
 const int   gPlayerPause(const int & index);
@@ -185,7 +188,7 @@ Uint32 timerFunctionAnotherThread(Uint32 interval, void *param)
     same interval: */
 
     userevent.type = SDL_USEREVENT;
-    userevent.code = 1;
+    userevent.code = SDL_USEREVENT_CODE_TIMER1;
     userevent.data1 = NULL;
     userevent.data2 = NULL;
 
@@ -203,12 +206,14 @@ int main( int argc, char *argv[] ) {
     int curPlayerIndex = -1;
     int playerIndex0 = -1;
     int playerIndex1 = -1;
+    SDL_TimerID timer_id = 0;
 
     LOG("Calling method main()");
 
     int running = 1;
 
     SDL_Init(SDL_INIT_EVERYTHING | SDL_INIT_TIMER);
+    gPlayerInit(); // Only after SDL has been initialized
 
     if (argc > 1) {
 //        draw_interrupter = SDL_updateYUVTexture;
@@ -219,7 +224,7 @@ int main( int argc, char *argv[] ) {
         if (argc > 2)
             playerIndex1 = gPlayerOpen(argv[2]);
 
-        SDL_TimerID timer_id = SDL_AddTimer(3000,timerFunctionAnotherThread, NULL);
+        timer_id = SDL_AddTimer(3000,timerFunctionAnotherThread, NULL);
 
         gPlayerPlay (playerIndex0);
 
@@ -294,19 +299,53 @@ int main( int argc, char *argv[] ) {
                     /* and now we can call the function we wanted to call in the timer but couldn't because of the multithreading problems */
                     switch (event.user.code)
                     {
-                        case 0:
+                        case SDL_USEREVENT_CODE_RENDER:
                         {
                             void (*p)(void *) = (void (*)(void *)) event.user.data1;
                             if (p)
                                 p(event.user.data2);
                             break;
                         }
-                        case 1:
+                        case SDL_USEREVENT_CODE_TIMER1:
                         {
                             if (playerIndex1 != -1)
                             {
                                 curPlayerIndex = curPlayerIndex == 0 ? 1 : 0;
                                 gPlayerSelectCurrent(curPlayerIndex);
+                            }
+                            break;
+                        }
+                        case SDL_USEREVENT_CODE_PLAYERFINISHED:
+                        {
+                            static int quitPlayerNb = 0;
+                            const char * quitPlayerFileName = reinterpret_cast<const char *>(event.user.data1);
+                            int quitPlayerIndex = -1;
+
+                            LOG ("Playback finish signal received: %s", quitPlayerFileName);
+
+                            for (int i = 0; i + 1 < argc; ++i)
+                            {
+                                LOG ("Compared filename: %s", argv[i + 1]);
+                                if (strcmp(quitPlayerFileName, argv[i + 1]) == 0)
+                                {
+                                    quitPlayerIndex = i;
+                                    break;
+                                }
+                            }
+                            if (quitPlayerIndex >= 0)
+                            {
+                                LOG ("Playback %d quit", quitPlayerIndex);
+                                gPlayerQuit (quitPlayerIndex);
+                                quitPlayerNb++;
+//                                if (quitPlayerNb + 1 == argc)
+                                if (quitPlayerNb == 2)
+                                {
+                                    running = 0;
+                                }
+                            }
+                            else
+                            {
+                                LOG ("Playback finish signal does not recognized");
                             }
                             break;
                         }
@@ -318,13 +357,18 @@ int main( int argc, char *argv[] ) {
         }
     }
 
-    LOG("finished");
+    LOG("Method main() finished");
+
+    if (timer_id != 0)
+        SDL_RemoveTimer (timer_id);
 
     gPlayerQuit(playerIndex0);
     if (playerIndex1 >= 0)
         gPlayerQuit(playerIndex1);
 
+    gPlayerRelease(); // Just before SDL quit
     SDL_Quit();
+    LOG("SDL_Quit");
 
     return 0;
 }

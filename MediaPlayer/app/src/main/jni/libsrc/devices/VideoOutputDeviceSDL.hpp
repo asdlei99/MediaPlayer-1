@@ -5,6 +5,12 @@
 #include <SDL.h>
 
 void my_function(void *pParam);
+enum SDL_ENUM_CODE
+{
+    SDL_USEREVENT_CODE_RENDER = 0,
+    SDL_USEREVENT_CODE_TIMER1 = 1,
+    SDL_USEREVENT_CODE_PLAYERFINISHED = 2
+};
 
 namespace JAZZROS {
 

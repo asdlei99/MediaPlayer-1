@@ -21,7 +21,8 @@ public:
 
     const int               open(const FFmpegFileHolder * pHolder, FFmpegPlayer * pRenderDest);
     void                    close();
-    
+    const bool              isOpened() const;
+
     const unsigned char*    getFrame() const;
 
     void                    setAudioSink(AudioSink * audio_sink);

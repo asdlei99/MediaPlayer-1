@@ -68,12 +68,18 @@ FFmpegStreamer::open(const FFmpegFileHolder * holder, FFmpegPlayer * pRenderDest
 void
 FFmpegStreamer::close()
 {
+    m_pLibAvStreamImpl->Close();
     if (m_holder != NULL)
     {
         m_holder = NULL;
     }
 }
 
+const bool
+FFmpegStreamer::isOpened() const
+{
+    return m_holder != NULL;
+}
 
 const unsigned char *
 FFmpegStreamer::getFrame() const

@@ -198,7 +198,7 @@ namespace JAZZROS {
             SDL_UserEvent   userevent;
 
             userevent.type = SDL_USEREVENT;
-            userevent.code = 0;
+            userevent.code = SDL_USEREVENT_CODE_RENDER;
             userevent.data1 = (void *)(& my_function);;
             userevent.data2 = (void *)(& m_render_param);
 

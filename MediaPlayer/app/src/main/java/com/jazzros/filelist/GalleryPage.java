@@ -2,6 +2,7 @@
 package com.jazzros.filelist;
 
 import android.app.Activity;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -24,14 +25,18 @@ import android.widget.Toast;
 import com.jazzros.ffmpegtest.R;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class GalleryPage extends Activity {
-    private int count;
-    private Bitmap[] thumbnails;
+    MediaRetriever  mediaRetriever;
+//    private int count;
+//    private Bitmap[] thumbnails;
     private boolean[] thumbnailsselection;
-    private String[] title;
-    private String[] arrPath;
+//    private String[] title;
+//    private String[] arrPath;
     private ImageAdapter imageAdapter;
+
+    public static final String ACTPARAM_STRINGARRAY = "parStringArray";
 
     /** Called when the activity is first created. */
     @Override
@@ -39,9 +44,19 @@ public class GalleryPage extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.gallery);
 
+        mediaRetriever = new MediaRetriever (getApplicationContext().getContentResolver());
+        mediaRetriever.prepare();
+
+        this.thumbnailsselection = new boolean[mediaRetriever.getSize()];
+
+        imageAdapter = new ImageAdapter();
+        GridView imagegrid = (GridView) findViewById(R.id.PhoneImageGrid);
+        imagegrid.setAdapter(imageAdapter);
+
+/*
         final String[] columns = { MediaStore.Video.Media.DATA, MediaStore.Video.Media._ID };
         final String orderBy = MediaStore.Video.Media._ID;
-        Cursor imagecursor = managedQuery(
+        Cursor imagecursor =managedQuery(
                 MediaStore.Video.Media.EXTERNAL_CONTENT_URI, columns, null,
                 null, orderBy);
         int image_column_index = imagecursor.getColumnIndex(MediaStore.Video.Media._ID);
@@ -63,7 +78,8 @@ public class GalleryPage extends Activity {
         GridView imagegrid = (GridView) findViewById(R.id.PhoneImageGrid);
         imageAdapter = new ImageAdapter();
         imagegrid.setAdapter(imageAdapter);
-        imagecursor.close();
+///        imagecursor.close();
+*/
 
         final Button selectBtn = (Button) findViewById(R.id.selectBtn);
         selectBtn.setOnClickListener(new OnClickListener() {
@@ -78,9 +94,9 @@ public class GalleryPage extends Activity {
                 {
                     if (thumbnailsselection[i]){
                         cnt++;
-                        selectImages = selectImages + arrPath[i] + "|";
+                        selectImages = selectImages + mediaRetriever.getItem(i).getPath() + "|";
 
-                        passParameterArray.add(arrPath[i]);
+                        passParameterArray.add(mediaRetriever.getItem(i).getPath());
                     }
                 }
                 if (cnt == 0){
@@ -96,7 +112,7 @@ public class GalleryPage extends Activity {
                     //
                     //
                     Bundle b=new Bundle();
-                    b.putStringArrayList("parStringArray", passParameterArray);
+                    b.putStringArrayList(ACTPARAM_STRINGARRAY, passParameterArray);
                     Intent intent = new Intent(getBaseContext(), org.libsdl.app.SDLActivity.class);
                     intent.putExtras(b);
                     startActivity(intent);
@@ -113,7 +129,7 @@ public class GalleryPage extends Activity {
         }
 
         public int getCount() {
-            return count;
+            return mediaRetriever.getSize();
         }
 
         public Object getItem(int position) {
@@ -162,11 +178,11 @@ public class GalleryPage extends Activity {
                     int id = v.getId();
                     Intent intent = new Intent();
                     intent.setAction(Intent.ACTION_VIEW);
-                    intent.setDataAndType(Uri.parse("file://" + arrPath[id]), "image/*");
+                    intent.setDataAndType(Uri.parse("file://" + mediaRetriever.getItem(id).getPath()), "image/*");
                     startActivity(intent);
                 }
             });
-            holder.imageview.setImageBitmap(thumbnails[position]);
+            holder.imageview.setImageBitmap(mediaRetriever.getItem(position).getThumbnail());
             holder.checkbox.setChecked(thumbnailsselection[position]);
             holder.id = position;
             return convertView;

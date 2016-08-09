@@ -40,6 +40,9 @@ namespace JAZZROS {
         void setFileName(const std::string &filename) {
             m_filename = filename;
         }
+        const std::string & getFileName(void) const {
+            return m_filename;
+        }
 
         void setPixelAspectRatio(const float &value) {
             m_pixAspectRatio = value;

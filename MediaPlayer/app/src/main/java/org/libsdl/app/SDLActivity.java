@@ -30,6 +30,8 @@ import android.media.*;
 import android.hardware.*;
 import android.content.pm.ActivityInfo;
 
+import com.jazzros.filelist.GalleryPage;
+
 /**
     SDL Activity
 */
@@ -208,7 +210,7 @@ public class SDLActivity extends Activity {
         }
         */
         if (intent != null) {
-            g_filepath_list = intent.getExtras().getStringArrayList("parStringArray");
+            g_filepath_list = intent.getExtras().getStringArrayList(GalleryPage.ACTPARAM_STRINGARRAY);
         }
     }
 

@@ -23,7 +23,7 @@ public:
 
     virtual void                    Start() = 0;
     virtual void                    Pause() = 0;
-    virtual void                    Stop() = 0;
+    virtual void                    Close() = 0;
     virtual void                    Seek(const unsigned long & newTimeMS) = 0;
 
     virtual const bool              isHasAudio() const = 0;

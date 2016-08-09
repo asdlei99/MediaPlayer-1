@@ -9,6 +9,8 @@
 
 #include "threads/ScopedLock.h"
 
+#include "devices/VideoOutputDeviceSDL.hpp" // todo: just for SDL_Event
+
 #include <memory>
 
 size_t getMemorySize();
@@ -455,10 +457,14 @@ const size_t FFmpegPlayer::t() const
 
 void FFmpegPlayer::cmdActivateOutput()
 {
-    AudioSinkManager::setSDLAudioSink (this);
+    // Operate ONLY if player is able to playback
+    if (m_streamer.isOpened())
+    {
+        AudioSinkManager::setSDLAudioSink (this);
 
-    if (m_pVOD && m_vodd)
-        m_pVOD->SetCurrentData(m_vodd);
+        if (m_pVOD)
+            m_pVOD->SetCurrentData(m_vodd);
+    }
 }
 
 void FFmpegPlayer::setAudioSink(FFmpegPlayer * player, JAZZROS::AudioStream *   audioStream, JAZZROS::AudioSink * sink)
@@ -474,6 +480,42 @@ void FFmpegPlayer::setAudioSink(FFmpegPlayer * player, JAZZROS::AudioStream *   
 
         if (prevStatus == JAZZROS::ImageStream::PLAYING)
             player->cmdPlay();
+    }
+}
+
+void FFmpegPlayer::playbackFinished(FFmpegPlayer * player)
+{
+    if (player)
+    {
+        player->pause();
+        if (player->getLoopingMode() == LOOPING)
+        {
+            player->rewind();
+            player->play();
+        }
+        else
+        {
+/*
+            if (m_audio_sink.get())
+                m_audio_sink->play(); // Cover edge case of paused audio sink still holding buffered data.
+*/
+            SDL_Event event;
+            SDL_UserEvent userevent;
+
+            /* In this example, our callback pushes an SDL_USEREVENT event
+            into the queue, and causes our callback to be called again at the
+            same interval: */
+
+            userevent.type = SDL_USEREVENT;
+            userevent.code = SDL_USEREVENT_CODE_PLAYERFINISHED;
+            userevent.data1 = const_cast<char *>(player->getFileName().c_str());
+            userevent.data2 = NULL;
+
+            event.type = SDL_USEREVENT;
+            event.user = userevent;
+
+            SDL_PushEvent(&event);
+        }
     }
 }
 

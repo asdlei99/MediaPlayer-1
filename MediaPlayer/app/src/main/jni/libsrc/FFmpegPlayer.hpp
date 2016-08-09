@@ -65,6 +65,7 @@ public:
     VideoOutputDeviceData *     getVODD();
 
     static void                 setAudioSink(FFmpegPlayer * player, JAZZROS::AudioStream *   audioStream, JAZZROS::AudioSink * sink);
+    static void                 playbackFinished(FFmpegPlayer * player);
 
 private:
     void                        close();

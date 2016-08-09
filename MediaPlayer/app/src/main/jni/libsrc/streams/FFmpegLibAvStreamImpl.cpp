@@ -35,16 +35,12 @@ FFmpegLibAvStreamImpl::setAudioSink(AudioSink * audio_sink)
     // The FFmpegLibAvStreamImpl object takes the responsability of destroying the audio_sink.
     av_log(NULL, AV_LOG_INFO, "FFmpegLibAvStreamImpl::setAudioSink()");
 
-    unsigned long playbackTime;
     bool isPlaybackPlay = isRunning();
     if (m_audio_sink.get() && m_audio_sink->playing())
         isPlaybackPlay = true;
 
     if (isPlaybackPlay)
-    {
-        playbackTime = GetPlaybackTime();
         Pause();
-    }
 
     //m_audio_sink = audio_sink;
     m_audio_sink.reset( audio_sink );
@@ -62,10 +58,7 @@ FFmpegLibAvStreamImpl::setAudioSink(AudioSink * audio_sink)
         m_isAudioSinkImplementsVolumeControl = detectIsItImplementedAudioVolume();
     }
     if (isPlaybackPlay)
-    {
-///        Seek (playbackTime);
         Start();
-    }
 }
 
 void
@@ -187,7 +180,7 @@ FFmpegLibAvStreamImpl::Pause()
 }
 
 void
-FFmpegLibAvStreamImpl::Stop()
+FFmpegLibAvStreamImpl::Close()
 {
     stopShadowThread();
     //
@@ -554,17 +547,7 @@ FFmpegLibAvStreamImpl::postRun()
         m_ellapsedAudioMicroSecOffsetInitial = 0;
 
         if (m_pPlayer)
-        {
-            m_pPlayer->pause();
-            m_pPlayer->rewind();
-            if (m_loop)
-                m_pPlayer->play();
-            else
-            {
-                if (m_audio_sink.get())
-                    m_audio_sink->play(); // Cover edge case of paused audio sink still holding buffered data.
-            }
-        }
+            FFmpegPlayer::playbackFinished(m_pPlayer);
     }
 }
 
