@@ -20,6 +20,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import com.jazzros.ffmpegtest.R;
@@ -50,7 +51,8 @@ public class GalleryPage extends Activity {
         this.thumbnailsselection = new boolean[mediaRetriever.getSize()];
 
         imageAdapter = new ImageAdapter();
-        GridView imagegrid = (GridView) findViewById(R.id.PhoneImageGrid);
+//        GridView imagegrid = (GridView) findViewById(R.id.PhoneImageGrid);
+        ListView imagegrid = (ListView) findViewById(R.id.PhoneImageGrid);
         imagegrid.setAdapter(imageAdapter);
 
 /*

@@ -10,6 +10,7 @@
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:minWidth="200px" />
+<!--
     <GridView
         android:id="@+id/PhoneImageGrid"
         android:layout_width="fill_parent"
@@ -21,4 +22,11 @@
         android:stretchMode="columnWidth"
         android:gravity="center"
         android:layout_above="@id/selectBtn" />
+!-->
+    <ListView
+        android:id="@+id/PhoneImageGrid"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:dividerHeight="1dp"
+        android:layout_above="@id/selectBtn"/>
 </RelativeLayout>

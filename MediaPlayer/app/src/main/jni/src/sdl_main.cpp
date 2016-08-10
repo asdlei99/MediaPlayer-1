@@ -273,8 +273,8 @@ int main( int argc, char *argv[] ) {
     }
     curPlayerIndex = 0;
 
-    int arg_par_index_0 = 4;
-    int arg_par_index_1 = 5;
+    int arg_par_index_0 = 2 + mediaFilesNb;
+    int arg_par_index_1 = arg_par_index_0 + 1;
     while (arg_par_index_0 < argc &&
            arg_par_index_1 < argc &&
            cmdOptionExists(argv + arg_par_index_0, argv + arg_par_index_1, "-i"))

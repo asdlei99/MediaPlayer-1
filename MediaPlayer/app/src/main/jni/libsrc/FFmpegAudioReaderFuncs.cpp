@@ -9,10 +9,13 @@ JAZZROS::FFmpegAudioReader*  gAudioReader;
 #include "devices/VideoOutputDeviceSDL.hpp"
 #include "devices/VideoOutputDeviceGL.hpp"
 #include "AudioSinkManager.h"
+#include <map>
 
 
 //JAZZROS::FFmpegPlayer           gPlayer;
-JAZZROS::FFmpegPlayer           gPlayerArray[2];
+//JAZZROS::FFmpegPlayer           gPlayerArray[2];
+//std::vector<JAZZROS::FFmpegPlayer*> gPlayerArray;
+std::map<int, JAZZROS::FFmpegPlayer* > gPlayerArray;
 JAZZROS::VideoOutputDevice *    gOutputDevicePtr = NULL;
 std::size_t                     gPlayerArrayNb = 0;
 
@@ -129,17 +132,6 @@ const int   gPlayerInit()
 
     return 0;
 }
-const int   gPlayerRelease()
-{
-    if (gOutputDevicePtr) {
-        delete gOutputDevicePtr;
-        gOutputDevicePtr = NULL;
-    }
-    if (AudioSinkManager::release() != 0)
-        return -1;
-
-    return 0;
-}
 
 const int   gPlayerOpen(const char * pFileName)
 {
@@ -153,15 +145,18 @@ const int   gPlayerOpen(const char * pFileName)
 ///    av_dict_set(parameters->getOptions(), "video_size", "1280:720", 0);
 //    av_dict_set(parameters->getOptions(), "video_size", "2048:2048", 0);
     //
-    JAZZROS::FFmpegPlayer & gPlayer = gPlayerArray[gPlayerArrayNb];
+    if (gPlayerArray.find(gPlayerArrayNb) == gPlayerArray.end())
+        gPlayerArray.insert(std::make_pair(gPlayerArrayNb, new JAZZROS::FFmpegPlayer()));
 
-    if (gPlayer.open(pFileName, parameters, gOutputDevicePtr) == true) {
+    JAZZROS::FFmpegPlayer * gPlayer = gPlayerArray[gPlayerArrayNb];
+
+    if (gPlayer->open(pFileName, parameters, gOutputDevicePtr) == true) {
 
         /**
          * After player's method open() has been through successfully, it's object contains
          * audio streams list. Audio stream should be initialized of real device for output.
          */
-        gPlayer.activateOutput();
+        gPlayer->activateOutput();
 
         gPlayerArrayNb++;
 
@@ -172,41 +167,87 @@ const int   gPlayerOpen(const char * pFileName)
 
 const int   gPlayerPlay(const int & index)
 {
-    gPlayerArray[index].play();
-    return 0;
+    JAZZROS::FFmpegPlayer * player = gPlayerArray[index];
+
+    if (player) {
+        player->play();
+        return 0;
+    }
+    return -1;
 }
 const int   gPlayerPause(const int & index)
 {
-    gPlayerArray[index].pause();
-    return 0;
+    JAZZROS::FFmpegPlayer * player = gPlayerArray[index];
+
+    if (player) {
+        player->pause();
+        return 0;
+    }
+    return -1;
 }
 
 const int   gPlayerSeek(const int & index, const double & percent)
 {
-    const double length = gPlayerArray[index].getLength();
-    gPlayerArray[index].seek(length * percent / 100.0);
+    JAZZROS::FFmpegPlayer * player = gPlayerArray[index];
 
-    return 0;
+    if (player) {
+
+        const double length = player->getLength();
+        player->seek(length * percent / 100.0);
+
+        return 0;
+    }
+    return -1;
 }
 const int   gPlayerSeekMS(const int & index, const int & ms)
 {
-    gPlayerArray[index].seek(ms);
+    JAZZROS::FFmpegPlayer * player = gPlayerArray[index];
 
-    return 0;
+    if (player) {
+        player->seek(ms);
+        return 0;
+    }
+
+    return -1;
 }
 void        gPlayerQuit(const int & index)
 {
-    gPlayerArray[index].quit();
+    JAZZROS::FFmpegPlayer * player = gPlayerArray[index];
+
+    if (player) {
+        player->quit();
+        delete player;
+        gPlayerArray.erase(index);
+    }
 }
 const int   gGetPlayerStatus(const int & index)
 {
-    switch (gPlayerArray[index].get_status()) {
-        case JAZZROS::ImageStream::PAUSED:
-            return 0;
-        case JAZZROS::ImageStream::PLAYING:
-            return 1;
-    };
+    JAZZROS::FFmpegPlayer * player = gPlayerArray[index];
+
+    if (player) {
+        switch (player->get_status()) {
+            case JAZZROS::ImageStream::PAUSED:
+                return 0;
+            case JAZZROS::ImageStream::PLAYING:
+                return 1;
+        };
+    }
+
     return -1;
+}
+const int   gPlayerRelease()
+{
+    for (int i = 0; i < gPlayerArrayNb; ++i)
+        gPlayerQuit (i);
+
+    if (gOutputDevicePtr) {
+        delete gOutputDevicePtr;
+        gOutputDevicePtr = NULL;
+    }
+    if (AudioSinkManager::release() != 0)
+        return -1;
+
+    return 0;
 }
 
 } // extern "C"
