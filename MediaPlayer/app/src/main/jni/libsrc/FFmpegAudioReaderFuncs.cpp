@@ -180,18 +180,17 @@ const int   gPlayerPause(const int & index)
     gPlayerArray[index].pause();
     return 0;
 }
-const int   gPlayerSelectCurrent(const int & index)
-{
-    JAZZROS::FFmpegPlayer & player = gPlayerArray[index];
 
-    player.activateOutput();
-
-    return 0;
-}
 const int   gPlayerSeek(const int & index, const double & percent)
 {
     const double length = gPlayerArray[index].getLength();
     gPlayerArray[index].seek(length * percent / 100.0);
+
+    return 0;
+}
+const int   gPlayerSeekMS(const int & index, const int & ms)
+{
+    gPlayerArray[index].seek(ms);
 
     return 0;
 }

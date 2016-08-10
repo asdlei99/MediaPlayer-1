@@ -44,6 +44,7 @@ public:
     virtual void                rewind();
     virtual void                seek(double time);
     virtual void                quit(bool waitForThreadToExit = true);
+
     void                        activateOutput();
 
     virtual void                setVolume(float volume);

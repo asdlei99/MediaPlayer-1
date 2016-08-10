@@ -28,6 +28,8 @@
 #include <SDL.h>
 #include <SDL_main.h>
 
+#include <algorithm>
+
 #define  LOG_TAG    "SDL"
 
 #ifdef ANDROID
@@ -143,8 +145,8 @@ const int   gPlayerRelease();
 const int   gPlayerOpen(const char * mfileName);
 const int   gPlayerPlay(const int & index);
 const int   gPlayerPause(const int & index);
-const int   gPlayerSelectCurrent(const int & index);
 const int   gPlayerSeek(const int & index, const double & percent);
+const int   gPlayerSeekMS(const int & index, const int & ms);
 void        gPlayerQuit(const int & index);
 
 int nativePlayerOpen(const char* mfileName)
@@ -200,31 +202,137 @@ Uint32 timerFunctionAnotherThread(Uint32 interval, void *param)
     return(interval);
 }
 
+struct MediaFileDescriptor {
+    int index;
+    int startMS;
+    int endMS;
+    std::string filename;
+};
+
+char* getCmdOption(char ** begin, char ** end, const std::string & option)
+{
+    char ** itr = std::find(begin, end, option);
+//    if (itr != end && ++itr != end)
+    if (itr != end)
+    {
+        return *++itr;
+    }
+    return NULL;
+}
+
+bool cmdOptionExists(char** begin, char** end, const std::string& option)
+{
+    return std::find(begin, end, option) != end;
+}
+
+/**
+    N<Number of media files>
+    File1
+    File2
+    ...
+    FileN
+    -i
+    <index of media file>
+    -s
+    <start MS>
+    -e
+    <end MS>
+*/
 // need for sdl2 static
 int main( int argc, char *argv[] ) {
 
+    std::vector<std::string> fileNameList;
+    std::vector<MediaFileDescriptor> mediaFileDescriptors;
+    std::size_t mediaFilesNb = 0;
+    if (argc > 1)
+        mediaFilesNb = atoi (argv[1]);
+
+    if (argc <= 1 + mediaFilesNb) {
+        LOG("Wrong params format");
+    }
+
     int curPlayerIndex = -1;
-    int playerIndex0 = -1;
-    int playerIndex1 = -1;
+    int playerIndex[128];
     SDL_TimerID timer_id = 0;
+
+    SDL_Init(SDL_INIT_EVERYTHING | SDL_INIT_TIMER);
+    if (gPlayerInit() != 0) {// Only after SDL has been initialized
+        LOG("Cannot initialize player");
+        return -1;
+    }
+
+    for (int i = 0; i < mediaFilesNb; ++i) {
+        char * pFileName = argv[2 + i];
+        fileNameList.push_back(pFileName);
+        playerIndex[i] = (i == 0) ? nativePlayerOpen(pFileName) : gPlayerOpen(pFileName);
+        curPlayerIndex = playerIndex[i];
+        if (curPlayerIndex < 0) {
+            LOG("Cannot open media file %s", argv[2 + i]);
+            return -1;
+        }
+    }
+    curPlayerIndex = 0;
+
+    int arg_par_index_0 = 4;
+    int arg_par_index_1 = 5;
+    while (arg_par_index_0 < argc &&
+           arg_par_index_1 < argc &&
+           cmdOptionExists(argv + arg_par_index_0, argv + arg_par_index_1, "-i"))
+    {
+        const int fileIndex = atoi(getCmdOption(argv + arg_par_index_0, argv + arg_par_index_1, "-i"));
+        int startMS;
+        int endMS;
+        if (fileIndex >= mediaFilesNb) {
+            LOG ("Wrong indexing of opened media");
+            return -1;
+        }
+        arg_par_index_0 = arg_par_index_1 + 1;
+        arg_par_index_1 = arg_par_index_0 + 1;
+        if (arg_par_index_0 < argc &&
+            arg_par_index_1 < argc &&
+            cmdOptionExists(argv + arg_par_index_0, argv + arg_par_index_1, "-s")) {
+                startMS = atoi(getCmdOption(argv + arg_par_index_0, argv + arg_par_index_1, "-s"));
+        } else {
+            LOG ("Missing params for playback media");
+            return -1;
+        }
+        arg_par_index_0 = arg_par_index_1 + 1;
+        arg_par_index_1 = arg_par_index_0 + 1;
+        if (arg_par_index_0 < argc &&
+            arg_par_index_1 < argc &&
+            cmdOptionExists(argv + arg_par_index_0, argv + arg_par_index_1, "-e")) {
+                endMS = atoi(getCmdOption(argv + arg_par_index_0, argv + arg_par_index_1, "-e"));
+        } else {
+            LOG ("Missing params for playback media");
+            return -1;
+        }
+        arg_par_index_0 = arg_par_index_1 + 1;
+        arg_par_index_1 = arg_par_index_0 + 1;
+        //
+        MediaFileDescriptor descr;
+        descr.index = playerIndex[fileIndex];
+        descr.startMS = startMS;
+        descr.endMS = endMS;
+        descr.filename = fileNameList[fileIndex];
+        mediaFileDescriptors.push_back(descr);
+    }
+
 
     LOG("Calling method main()");
 
     int running = 1;
 
-    SDL_Init(SDL_INIT_EVERYTHING | SDL_INIT_TIMER);
-    gPlayerInit(); // Only after SDL has been initialized
 
     if (argc > 1) {
 //        draw_interrupter = SDL_updateYUVTexture;
-
+/*
         playerIndex0 = nativePlayerOpen(argv[1]);
         curPlayerIndex = playerIndex0;
 
         if (argc > 2)
             playerIndex1 = gPlayerOpen(argv[2]);
 
-        timer_id = SDL_AddTimer(3000,timerFunctionAnotherThread, NULL);
+        timer_id = SDL_AddTimer(3000, timerFunctionAnotherThread, NULL);
 
         gPlayerPlay (playerIndex0);
 
@@ -232,6 +340,15 @@ int main( int argc, char *argv[] ) {
             gPlayerPlay (playerIndex1);
             curPlayerIndex = playerIndex1;
         }
+*/
+        MediaFileDescriptor & descr = mediaFileDescriptors[curPlayerIndex];
+        gPlayerSeekMS(descr.index,
+                      descr.startMS);
+        gPlayerPlay (descr.index);
+        timer_id = SDL_AddTimer(descr.endMS -
+                                descr.startMS,
+                                timerFunctionAnotherThread,
+                                NULL);
     }
     //
     while (running) {
@@ -247,6 +364,7 @@ int main( int argc, char *argv[] ) {
                             running = 0;
                             break;
                         }
+/*
                         case SDL_SCANCODE_1: {
                             LOG("Pressed button #1");
                             gPlayerSeek(curPlayerIndex, 0.0);
@@ -287,6 +405,7 @@ int main( int argc, char *argv[] ) {
                             gPlayerSelectCurrent(curPlayerIndex);
                             break;
                         }
+*/
                         case  SDL_SCANCODE_Q: {
                             LOG("pressed Q-button, terminating");
                             running = 0;
@@ -308,11 +427,27 @@ int main( int argc, char *argv[] ) {
                         }
                         case SDL_USEREVENT_CODE_TIMER1:
                         {
-                            if (playerIndex1 != -1)
-                            {
-                                curPlayerIndex = curPlayerIndex == 0 ? 1 : 0;
-                                gPlayerSelectCurrent(curPlayerIndex);
+                            gPlayerPause (mediaFileDescriptors[curPlayerIndex].index);
+                            curPlayerIndex++;
+                            if (curPlayerIndex < mediaFileDescriptors.size()) {
+                                SDL_RemoveTimer (timer_id);
+                                MediaFileDescriptor & descr = mediaFileDescriptors[curPlayerIndex];
+
+                                gPlayerSeekMS(descr.index,
+                                              descr.startMS);
+                                gPlayerPlay (descr.index);
+                                timer_id = SDL_AddTimer(descr.endMS -
+                                                        descr.startMS,
+                                                        timerFunctionAnotherThread,
+                                                        NULL);
+                                if (timer_id == 0) {
+                                    LOG ("ERROR in timing processes");
+                                    return -1;
+                                }
+                            } else {
+                                running = 0;
                             }
+
                             break;
                         }
                         case SDL_USEREVENT_CODE_PLAYERFINISHED:
@@ -325,8 +460,7 @@ int main( int argc, char *argv[] ) {
 
                             for (int i = 0; i + 1 < argc; ++i)
                             {
-                                LOG ("Compared filename: %s", argv[i + 1]);
-                                if (strcmp(quitPlayerFileName, argv[i + 1]) == 0)
+                                if (strcmp(quitPlayerFileName, argv[i + 2]) == 0)
                                 {
                                     quitPlayerIndex = i;
                                     break;
@@ -338,7 +472,7 @@ int main( int argc, char *argv[] ) {
                                 gPlayerQuit (quitPlayerIndex);
                                 quitPlayerNb++;
 //                                if (quitPlayerNb + 1 == argc)
-                                if (quitPlayerNb == 2)
+                                if (quitPlayerNb == mediaFileDescriptors.size())
                                 {
                                     running = 0;
                                 }
@@ -362,9 +496,8 @@ int main( int argc, char *argv[] ) {
     if (timer_id != 0)
         SDL_RemoveTimer (timer_id);
 
-    gPlayerQuit(playerIndex0);
-    if (playerIndex1 >= 0)
-        gPlayerQuit(playerIndex1);
+    for (int i = 0; i < mediaFileDescriptors.size(); ++i)
+        gPlayerQuit(mediaFileDescriptors[i].index);
 
     gPlayerRelease(); // Just before SDL quit
     SDL_Quit();

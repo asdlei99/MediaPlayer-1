@@ -382,8 +382,10 @@ bool FFmpegPlayer::handleCommand(const Command cmd)
 
 void FFmpegPlayer::cmdPlay()
 {
-    if (_status == PAUSED)
+    if (_status == PAUSED) {
         m_streamer.play();
+        cmdActivateOutput();
+    }
 
     _status = PLAYING;
 }

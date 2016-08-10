@@ -99,6 +99,25 @@ public class GalleryPage extends Activity {
                         passParameterArray.add(mediaRetriever.getItem(i).getPath());
                     }
                 }
+                passParameterArray.add (0, Integer.toString(cnt));
+                passParameterArray.add("-i");
+                passParameterArray.add(Integer.toString(1));
+                passParameterArray.add("-s");
+                passParameterArray.add(Integer.toString(5000));
+                passParameterArray.add("-e");
+                passParameterArray.add(Integer.toString(10000));
+                passParameterArray.add("-i");
+                passParameterArray.add(Integer.toString(0));
+                passParameterArray.add("-s");
+                passParameterArray.add(Integer.toString(5000));
+                passParameterArray.add("-e");
+                passParameterArray.add(Integer.toString(10000));
+                passParameterArray.add("-i");
+                passParameterArray.add(Integer.toString(1));
+                passParameterArray.add("-s");
+                passParameterArray.add(Integer.toString(10000));
+                passParameterArray.add("-e");
+                passParameterArray.add(Integer.toString(15000));
                 if (cnt == 0){
                     Toast.makeText(getApplicationContext(),
                             "Please select at least one image",
