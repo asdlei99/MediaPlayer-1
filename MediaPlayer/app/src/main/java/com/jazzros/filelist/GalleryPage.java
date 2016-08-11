@@ -21,6 +21,7 @@ import android.widget.CheckBox;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.jazzros.ffmpegtest.R;
@@ -169,6 +170,8 @@ public class GalleryPage extends Activity {
                         R.layout.galleryitem, null);
                 holder.imageview = (ImageView) convertView.findViewById(R.id.thumbImage);
                 holder.checkbox = (CheckBox) convertView.findViewById(R.id.itemCheckBox);
+                holder.title = (TextView) convertView.findViewById(R.id.title);
+                holder.duration = (TextView) convertView.findViewById(R.id.duration);
 
                 convertView.setTag(holder);
             }
@@ -205,6 +208,8 @@ public class GalleryPage extends Activity {
             });
             holder.imageview.setImageBitmap(mediaRetriever.getItem(position).getThumbnail());
             holder.checkbox.setChecked(thumbnailsselection[position]);
+            holder.title.setText(mediaRetriever.getItem(position).getTitle());
+            holder.duration.setText (Long.toString(mediaRetriever.getItem(position).getDuration()));
             holder.id = position;
             return convertView;
         }
@@ -212,6 +217,8 @@ public class GalleryPage extends Activity {
     class ViewHolder {
         ImageView imageview;
         CheckBox checkbox;
+        TextView title;
+        TextView duration;
         int id;
     }
 }
