@@ -67,8 +67,8 @@ namespace JAZZROS {
         SDL_Texture *bitmapTex;
         int     m_sdlPixelFormat;
         VideoOutputDeviceDataSDL()
-                :VideoOutputDeviceData(AV_PIX_FMT_YUV420P)
-                //:VideoOutputDeviceData(AV_PIX_FMT_RGB565LE)
+                //:VideoOutputDeviceData(AV_PIX_FMT_YUV420P)
+                :VideoOutputDeviceData(AV_PIX_FMT_RGB565LE)
                 ,bitmapTex(NULL)
         {}
         virtual ~VideoOutputDeviceDataSDL()

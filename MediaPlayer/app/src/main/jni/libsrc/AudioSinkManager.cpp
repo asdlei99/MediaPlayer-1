@@ -25,6 +25,8 @@ AudioSinkManager::initialize()
     if (m_sdl_audiosink_ptr == NULL)
         m_sdl_audiosink_ptr = new SDLAudioSink (NULL);
 
+    m_lastSetSDLAudioPlayer = NULL;
+
     return 0;
 }
 
@@ -36,6 +38,9 @@ AudioSinkManager::release()
         delete m_sdl_audiosink_ptr;
         m_sdl_audiosink_ptr = NULL;
     }
+
+    m_lastSetSDLAudioPlayer = NULL;
+
     return 0;
 }
 

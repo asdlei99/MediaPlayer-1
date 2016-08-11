@@ -216,8 +216,13 @@ void        gPlayerQuit(const int & index)
 
     if (player) {
         player->quit();
+        /**
+            We cannot delete objects of player
+            because it could be used in other objects.
+            For example - last Player in AudioSinkManager;
         delete player;
         gPlayerArray.erase(index);
+        */
     }
 }
 const int   gGetPlayerStatus(const int & index)
@@ -237,7 +242,9 @@ const int   gGetPlayerStatus(const int & index)
 }
 const int   gPlayerRelease()
 {
-    for (int i = 0; i < gPlayerArrayNb; ++i)
+    int i;
+
+    for (i = 0; i < gPlayerArrayNb; ++i)
         gPlayerQuit (i);
 
     if (gOutputDevicePtr) {
@@ -246,6 +253,15 @@ const int   gPlayerRelease()
     }
     if (AudioSinkManager::release() != 0)
         return -1;
+
+    for (i = 0; i < gPlayerArrayNb; ++i)
+    {
+        JAZZROS::FFmpegPlayer * player = gPlayerArray[i];
+        if (player) {
+            delete player;
+            gPlayerArray.erase(i);
+        }
+    }
 
     return 0;
 }

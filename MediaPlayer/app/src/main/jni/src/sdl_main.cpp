@@ -19,6 +19,9 @@
 // ffmpeg
 // https://github.com/OnlyInAmerica/FFmpegTest/tree/master/jni
 
+// Android Drag&Drop listview
+// https://github.com/terlici/DragNDropList
+
 #ifdef ANDROID
     #include <GLES2/gl2.h>
 #else // ANDROID
